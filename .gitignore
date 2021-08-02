@@ -1,0 +1,12 @@
+# Ignore everything
+/*
+
+# Cabal
+!/oktade.cabal
+
+# Source
+!/.gitignore
+!/LICENSE
+!/app/
+!/src/
+!/test/
