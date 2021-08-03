@@ -10,16 +10,25 @@ license-file:  LICENSE
 
 library
   -- Modules exported by the library.
-  exposed-modules:  MyLib
+  exposed-modules:
+    Data.Oktade.Classfile
+    Data.Oktade.Classfile.MagicNumber
+    Data.Oktade.Classfile.Version
 
+  -- Data.Oktade.ByteConstant
   -- Modules included in this library but not exported.
-  -- other-modules:
+  other-modules:
+    Data.Oktade.Internal.Bytecode
+    Data.Oktade.Parser
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
 
   -- Other library packages from which modules are imported.
-  build-depends:    base ^>=4.14.2.0
+  build-depends:
+    , attoparsec  ^>=0.14.1
+    , base        ^>=4.14.2.0
+    , bytestring  ^>=0.11.1.0
 
   -- Directories containing source files.
   hs-source-dirs:   src
@@ -47,19 +56,3 @@ executable oktade
 
   -- Base language which the package is written in.
   default-language: Haskell2010
-
-test-suite oktade-test
-  -- Base language which the package is written in.
-  default-language: Haskell2010
-
-  -- The interface type and version of the test suite.
-  type:             exitcode-stdio-1.0
-
-  -- Directories containing source files.
-  hs-source-dirs:   test
-
-  -- The entrypoint to the test suite.
-  main-is:          MyLibTest.hs
-
-  -- Test dependencies.
-  build-depends:    base ^>=4.14.2.0
