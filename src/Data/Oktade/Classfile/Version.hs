@@ -2,7 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Version
 -- License     : Apache-2.0
 --
--- This module contains type definitions regarding the classfile magic number.
+-- This module contains type definitions and parsers for the classfile version.
 module Data.Oktade.Classfile.Version
   ( -- * Version
     Version (..),

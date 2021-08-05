@@ -2,8 +2,8 @@
 -- Module      : Data.Oktade.Classfile.ConstantPool
 -- License     : Apache-2.0
 --
--- This module contains type definitions regarding the classfile constant pool
--- and its entries.
+-- This module contains type definitions and parsers for the classfile constant
+-- pool and its entries.
 module Data.Oktade.Classfile.ConstantPool
   ( -- * Constant Pool
     ConstantPool (..),
@@ -28,8 +28,14 @@ module Data.Oktade.Classfile.ConstantPool
 
     -- ** Constant Pool Entries
     ConstantPoolEntry (..),
+    MethodRefKind (..),
 
     -- ** References
+    ClassRef (..),
+    NameAndTypeRef (..),
+    Utf8Ref (..),
+    ConstantPoolRef (..),
+    BootstrapMethodAttrRef (..),
   )
 where
 
@@ -71,7 +77,7 @@ instance Bytecode ConstantPool where
   encode (ConstantPool m) =
     word16BE (fromIntegral (sizeC m + 1)) <> foldr ((<>) . encode) mempty m
     where
-      sizeC m = foldr (\x -> (+ constantPoolSize x)) 0 m
+      sizeC m = foldr ((+) . constantPoolSize) 0 m
 
 --------------------------------------------------------------------------------
 -- Constant Pool Tags

@@ -2,7 +2,8 @@
 -- Module      : Data.Oktade.Classfile.MagicNumber
 -- License     : Apache-2.0
 --
--- This module contains type definitions regarding the classfile magic number.
+-- This module contains type definitions and parsers for the classfile magic
+-- number.
 module Data.Oktade.Classfile.MagicNumber
   ( -- * Magic Number
     MagicNumber (..),

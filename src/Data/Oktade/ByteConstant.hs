@@ -6,6 +6,7 @@
 module Data.Oktade.ByteConstant
   ( -- * Constant Types
     Word8Constant (..),
+    Word16Constant (..),
     ByteStringConstant (..),
   )
 where
@@ -19,6 +20,9 @@ import Data.Word (Word16, Word32, Word8)
 
 class Word8Constant a where
   value8 :: a -> Word8
+
+class Word16Constant a where
+  value16 :: a -> Word16
 
 -- | Class for ADTs representing constants (like the magic number).
 -- Note: Classfiles are stored in Big Endian.

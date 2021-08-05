@@ -13,8 +13,11 @@ library
   exposed-modules:
     Data.Oktade.ByteConstant
     Data.Oktade.Classfile
+    Data.Oktade.Classfile.AccessFlags
     Data.Oktade.Classfile.ConstantPool
     Data.Oktade.Classfile.MagicNumber
+    Data.Oktade.Classfile.SuperClass
+    Data.Oktade.Classfile.ThisClass
     Data.Oktade.Classfile.Version
 
   -- Data.Oktade.ByteConstant
