@@ -11,9 +11,7 @@ module Data.Oktade.Internal.Bytecode
 where
 
 import Data.Attoparsec.ByteString.Lazy (Parser)
-import Data.ByteString (ByteString, pack)
 import Data.ByteString.Builder (Builder)
-import Data.Word (Word8)
 
 --------------------------------------------------------------------------------
 -- Type Conversion

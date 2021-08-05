@@ -11,7 +11,9 @@ license-file:  LICENSE
 library
   -- Modules exported by the library.
   exposed-modules:
+    Data.Oktade.ByteConstant
     Data.Oktade.Classfile
+    Data.Oktade.Classfile.ConstantPool
     Data.Oktade.Classfile.MagicNumber
     Data.Oktade.Classfile.Version
 
@@ -19,7 +21,7 @@ library
   -- Modules included in this library but not exported.
   other-modules:
     Data.Oktade.Internal.Bytecode
-    Data.Oktade.Parser
+    Data.Oktade.Internal.Parser
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
@@ -29,6 +31,7 @@ library
     , attoparsec  ^>=0.14.1
     , base        ^>=4.14.2.0
     , bytestring  ^>=0.11.1.0
+    , containers  ^>=0.6.5.1
 
   -- Directories containing source files.
   hs-source-dirs:   src
@@ -48,7 +51,9 @@ executable oktade
 
   -- Other library packages from which modules are imported.
   build-depends:
-    , base    ^>=4.14.2.0
+    , attoparsec  ^>=0.14.1
+    , base        ^>=4.14.2.0
+    , bytestring  ^>=0.11.1.0
     , oktade
 
   -- Directories containing source files.

@@ -1,19 +1,28 @@
+-- |
+-- Module      : Data.Oktade.ByteConstant
+-- License     : Apache-2.0
+--
+-- This module contains the type class definition for constant ADTs.
 module Data.Oktade.ByteConstant
   ( -- * Constant Types
-    ByteConstant (..),
+    Word8Constant (..),
+    ByteStringConstant (..),
   )
 where
 
 import Data.ByteString (ByteString, pack)
-import Data.Word (Word8)
+import Data.Word (Word16, Word32, Word8)
 
 --------------------------------------------------------------------------------
 -- Constant Types
 --------------------------------------------------------------------------------
 
+class Word8Constant a where
+  value8 :: a -> Word8
+
 -- | Class for ADTs representing constants (like the magic number).
 -- Note: Classfiles are stored in Big Endian.
-class ByteConstant a where
+class ByteStringConstant a where
   -- | The value as 'Word8' list.
   rawValue :: a -> [Word8]
 

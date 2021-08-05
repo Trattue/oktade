@@ -11,7 +11,7 @@ where
 
 import Data.Attoparsec.ByteString.Lazy (string)
 import Data.ByteString.Builder (byteString)
-import Data.Oktade.ByteConstant (ByteConstant (..))
+import Data.Oktade.ByteConstant (ByteStringConstant (..))
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
 
 --------------------------------------------------------------------------------
@@ -25,9 +25,9 @@ import Data.Oktade.Internal.Bytecode (Bytecode (..))
 data MagicNumber = Cafebabe
   deriving (Eq, Show)
 
-instance ByteConstant MagicNumber where
+instance ByteStringConstant MagicNumber where
   rawValue Cafebabe = [0xCA, 0xFE, 0xBA, 0xBE]
 
 instance Bytecode MagicNumber where
   parser = Cafebabe <$ string (value Cafebabe)
-  encode Cafebabe = byteString $ value Cafebabe
+  encode m = byteString $ value m

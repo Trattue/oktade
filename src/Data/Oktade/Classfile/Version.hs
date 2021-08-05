@@ -11,9 +11,9 @@ module Data.Oktade.Classfile.Version
   )
 where
 
-import Data.ByteString.Builder (word16Dec)
+import Data.ByteString.Builder (word16BE)
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Parser (anyWord16)
+import Data.Oktade.Internal.Parser (anyWord16)
 import Data.Word (Word16)
 
 --------------------------------------------------------------------------------
@@ -40,4 +40,4 @@ instance Bytecode Version where
     minor <- anyWord16
     major <- anyWord16
     return $ Version major minor
-  encode (Version major minor) = word16Dec minor <> word16Dec major
+  encode (Version major minor) = word16BE minor <> word16BE major
