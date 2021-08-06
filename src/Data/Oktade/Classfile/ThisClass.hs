@@ -21,7 +21,9 @@ import Data.Oktade.Internal.Parser (anyWord16)
 
 -- | Reference to the current class in the constant pool.
 newtype ThisClass = ThisClass ClassRef
-  deriving (Show)
+
+instance Show ThisClass where
+  show (ThisClass c) = "This class: " ++ show c
 
 instance Bytecode ThisClass where
   parser = ThisClass . ClassRef <$> anyWord16

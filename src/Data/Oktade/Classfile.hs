@@ -52,7 +52,18 @@ data Classfile = Classfile
     thisClass :: ThisClass,
     superClass :: SuperClass
   } -- TODO
-  deriving (Show)
+
+instance Show Classfile where
+  show c =
+    init $
+      unlines
+        [ show (magic c),
+          show (version c),
+          show (constantPool c),
+          show (accessFlags c),
+          show (thisClass c),
+          show (superClass c)
+        ]
 
 instance Bytecode Classfile where
   parser =

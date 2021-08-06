@@ -26,7 +26,9 @@ import Data.Word (Word16)
 -- JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data Version = Version Major Minor
-  deriving (Show)
+
+instance Show Version where
+  show (Version major minor) = "Version: " ++ show major ++ "." ++ show minor
 
 -- | The classfile major version.
 type Major = Word16

@@ -23,7 +23,11 @@ import Data.Oktade.Internal.Parser (anyWord16)
 
 -- | Represents the list of 'AccessFlag's the classfiles class/interface has.
 newtype AccessFlags = AccessFlags [AccessFlag]
-  deriving (Show)
+
+instance Show AccessFlags where
+  show (AccessFlags []) = "Access Flags: -"
+  show (AccessFlags af) =
+    "Access Flags:\n" ++ init (unlines $ map (("  " ++) . show) af)
 
 instance Bytecode AccessFlags where
   parser =

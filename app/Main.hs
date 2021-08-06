@@ -14,6 +14,7 @@ main = do
       putStrLn "Remaining input:"
       print i
     Done i r -> do
+      putStrLn ""
       print r
       putStr "\nTesting homomorphism... "
       let encoded = encodeClassfile r

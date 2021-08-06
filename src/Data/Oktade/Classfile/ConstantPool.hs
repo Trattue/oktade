@@ -44,11 +44,12 @@ import qualified Data.Attoparsec.ByteString as BS (take)
 import Data.ByteString (ByteString, length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE, word64BE)
 import qualified Data.ByteString.Builder as B (byteString, word8)
-import Data.IntMap (IntMap, fromAscList, size)
+import Data.IntMap (IntMap, fromAscList, size, toAscList)
 import Data.Oktade.ByteConstant (ByteStringConstant, Word8Constant (..))
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
 import Data.Oktade.Internal.Parser (anyWord16, anyWord32, anyWord64)
 import Data.Word (Word16, Word32, Word64, Word8)
+import Text.Printf (printf)
 
 --------------------------------------------------------------------------------
 -- Constant Pool
@@ -60,7 +61,17 @@ import Data.Word (Word16, Word32, Word64, Word8)
 -- JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
 newtype ConstantPool = ConstantPool (IntMap ConstantPoolEntry)
-  deriving (Show)
+
+instance Show ConstantPool where
+  show (ConstantPool m)
+    | null m = "Constant Pool: -"
+    | otherwise =
+      let l = size m
+          d = 1 + ceiling (logBase 10 (fromIntegral l))
+       in init $ "Constant Pool:\n" ++ unlines (map (showEntry l d) $ toAscList m)
+    where
+      showEntry l d (k, v) =
+        printf ("  %" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ show v
 
 instance Bytecode ConstantPool where
   parser = do
@@ -85,7 +96,9 @@ instance Bytecode ConstantPool where
 
 -- | Tag for the 'Class' constant pool entry.
 data TClass = TClass
-  deriving (Show)
+
+instance Show TClass where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TClass where
   value8 TClass = 7
@@ -96,7 +109,9 @@ instance Bytecode TClass where
 
 -- | Tag for the 'FieldRef' constant pool entry.
 data TFieldRef = TFieldRef
-  deriving (Show)
+
+instance Show TFieldRef where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TFieldRef where
   value8 TFieldRef = 9
@@ -107,7 +122,9 @@ instance Bytecode TFieldRef where
 
 -- | Tag for the 'MethodRef' constant pool entry.
 data TMethodRef = TMethodRef
-  deriving (Show)
+
+instance Show TMethodRef where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TMethodRef where
   value8 TMethodRef = 10
@@ -118,7 +135,9 @@ instance Bytecode TMethodRef where
 
 -- | Tag for the 'InterfaceMethodRef' constant pool entry.
 data TInterfaceMethodRef = TInterfaceMethodRef
-  deriving (Show)
+
+instance Show TInterfaceMethodRef where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TInterfaceMethodRef where
   value8 TInterfaceMethodRef = 11
@@ -129,7 +148,9 @@ instance Bytecode TInterfaceMethodRef where
 
 -- | Tag for the 'String' constant pool entry.
 data TString = TString
-  deriving (Show)
+
+instance Show TString where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TString where
   value8 TString = 8
@@ -140,7 +161,9 @@ instance Bytecode TString where
 
 -- | Tag for the 'Integer' constant pool entry.
 data TInteger = TInteger
-  deriving (Show)
+
+instance Show TInteger where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TInteger where
   value8 TInteger = 3
@@ -151,7 +174,9 @@ instance Bytecode TInteger where
 
 -- | Tag for the 'Float' constant pool entry.
 data TFloat = TFloat
-  deriving (Show)
+
+instance Show TFloat where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TFloat where
   value8 TFloat = 4
@@ -162,7 +187,9 @@ instance Bytecode TFloat where
 
 -- | Tag for the 'Long' constant pool entry.
 data TLong = TLong
-  deriving (Show)
+
+instance Show TLong where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TLong where
   value8 TLong = 5
@@ -173,7 +200,9 @@ instance Bytecode TLong where
 
 -- | Tag for the 'Double' constant pool entry.
 data TDouble = TDouble
-  deriving (Show)
+
+instance Show TDouble where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TDouble where
   value8 TDouble = 6
@@ -184,7 +213,9 @@ instance Bytecode TDouble where
 
 -- | Tag for the 'NameAndType' constant pool entry.
 data TNameAndType = TNameAndType
-  deriving (Show)
+
+instance Show TNameAndType where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TNameAndType where
   value8 TNameAndType = 12
@@ -195,7 +226,9 @@ instance Bytecode TNameAndType where
 
 -- | Tag for the 'Utf8' constant pool entry.
 data TUtf8 = TUtf8
-  deriving (Show)
+
+instance Show TUtf8 where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TUtf8 where
   value8 TUtf8 = 1
@@ -206,7 +239,9 @@ instance Bytecode TUtf8 where
 
 -- | Tag for the 'MethodHandle' constant pool entry.
 data TMethodHandle = TMethodHandle
-  deriving (Show)
+
+instance Show TMethodHandle where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TMethodHandle where
   value8 TMethodHandle = 15
@@ -217,7 +252,9 @@ instance Bytecode TMethodHandle where
 
 -- | Tag for the 'MethodType' constant pool entry.
 data TMethodType = TMethodType
-  deriving (Show)
+
+instance Show TMethodType where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TMethodType where
   value8 TMethodType = 16
@@ -228,7 +265,9 @@ instance Bytecode TMethodType where
 
 -- | Tag for the 'Dynamic' constant pool entry.
 data TDynamic = TDynamic
-  deriving (Show)
+
+instance Show TDynamic where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TDynamic where
   value8 TDynamic = 17
@@ -239,7 +278,9 @@ instance Bytecode TDynamic where
 
 -- | Tag for the 'InvokeDynamic' constant pool entry.
 data TInvokeDynamic = TInvokeDynamic
-  deriving (Show)
+
+instance Show TInvokeDynamic where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TInvokeDynamic where
   value8 TInvokeDynamic = 18
@@ -250,7 +291,9 @@ instance Bytecode TInvokeDynamic where
 
 -- | Tag for the 'Module' constant pool entry.
 data TModule = TModule
-  deriving (Show)
+
+instance Show TModule where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TModule where
   value8 TModule = 19
@@ -261,7 +304,9 @@ instance Bytecode TModule where
 
 -- | Tag for the 'Package' constant pool entry.
 data TPackage = TPackage
-  deriving (Show)
+
+instance Show TPackage where
+  show t = "(" ++ show (value8 t) ++ ")"
 
 instance Word8Constant TPackage where
   value8 TPackage = 20

@@ -22,7 +22,10 @@ import Data.Oktade.Internal.Parser (anyWord16)
 -- | Reference to the super class in the constant pool or 'Object', if no super
 -- class is defined.
 data SuperClass = Object | SuperClass ClassRef
-  deriving (Show)
+
+instance Show SuperClass where
+  show Object = "Super class: Object"
+  show (SuperClass c) = "Super class: " ++ show c
 
 instance Bytecode SuperClass where
   parser = do

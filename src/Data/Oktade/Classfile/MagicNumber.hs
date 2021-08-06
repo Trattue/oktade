@@ -11,9 +11,11 @@ module Data.Oktade.Classfile.MagicNumber
 where
 
 import Data.Attoparsec.ByteString.Lazy (string)
-import Data.ByteString.Builder (byteString)
+import Data.ByteString.Builder (byteString, byteStringHex, toLazyByteString)
+import Data.Char (toUpper)
 import Data.Oktade.ByteConstant (ByteStringConstant (..))
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
+import Numeric (showHex)
 
 --------------------------------------------------------------------------------
 -- Magic Number
@@ -24,7 +26,10 @@ import Data.Oktade.Internal.Bytecode (Bytecode (..))
 -- JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data MagicNumber = Cafebabe
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show MagicNumber where
+  show Cafebabe = "Magic number: 0xCAFEBABE"
 
 instance ByteStringConstant MagicNumber where
   rawValue Cafebabe = [0xCA, 0xFE, 0xBA, 0xBE]
