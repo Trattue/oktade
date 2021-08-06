@@ -17,8 +17,11 @@ import Data.ByteString.Builder (Builder)
 -- Type Conversion
 --------------------------------------------------------------------------------
 
--- | Type class for decoding/encoding 'ByteString's to data types/data types to
+-- | Type class for parsing/encoding 'ByteString's to data types/data types to
 -- 'ByteString's.
 class Bytecode a where
+  -- | Parser for parsing data structures from 'ByteString's.
   parser :: Parser a
+
+  -- | Encoder for converting data structures back to 'ByteString's.
   encode :: a -> Builder

@@ -29,4 +29,4 @@ instance Bytecode SuperClass where
     super <- anyWord16
     return $ if super == 0 then Object else SuperClass $ ClassRef super
   encode Object = word16BE 0
-  encode (SuperClass (ClassRef c)) = word16BE c
+  encode (SuperClass c) = encode c

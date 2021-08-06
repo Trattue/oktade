@@ -343,63 +343,47 @@ instance Bytecode ConstantPoolEntry where
         parserPackage
       ]
     where
-      parserClass = Class <$> parser <*> (Utf8Ref <$> anyWord16)
-      parserFieldRef =
-        FieldRef <$> parser <*> (ClassRef <$> anyWord16)
-          <*> (NameAndTypeRef <$> anyWord16)
-      parserMethodRef =
-        MethodRef <$> parser <*> (ClassRef <$> anyWord16)
-          <*> (NameAndTypeRef <$> anyWord16)
+      parserClass = Class <$> parser <*> parser
+      parserFieldRef = FieldRef <$> parser <*> parser <*> parser
+      parserMethodRef = MethodRef <$> parser <*> parser <*> parser
       parserInterfaceMethodRef =
-        InterfaceMethodRef <$> parser <*> (ClassRef <$> anyWord16)
-          <*> (NameAndTypeRef <$> anyWord16)
-      parserString = String <$> parser <*> (Utf8Ref <$> anyWord16)
+        InterfaceMethodRef <$> parser <*> parser <*> parser
+      parserString = String <$> parser <*> parser
       parserInteger = Integer <$> parser <*> anyWord32
       parserFloat = Float <$> parser <*> anyWord32
       parserLong = Long <$> parser <*> anyWord64
       parserDouble = Double <$> parser <*> anyWord64
-      parserNameAndType =
-        NameAndType <$> parser <*> (Utf8Ref <$> anyWord16)
-          <*> (Utf8Ref <$> anyWord16)
+      parserNameAndType = NameAndType <$> parser <*> parser <*> parser
       parserUtf8 =
         Utf8 <$> parser <*> do
           length <- anyWord16
           BS.take (fromIntegral length)
-      parserMethodHandle =
-        MethodHandle <$> parser <*> parser <*> (ConstantPoolRef <$> anyWord16)
-      parserMethodType = MethodType <$> parser <*> (Utf8Ref <$> anyWord16)
-      parserDynamic =
-        Dynamic <$> parser <*> anyWord16 <*> (NameAndTypeRef <$> anyWord16)
-      parserInvokeDynamic =
-        InvokeDynamic <$> parser <*> anyWord16
-          <*> (NameAndTypeRef <$> anyWord16)
-      parserModule = Module <$> parser <*> (Utf8Ref <$> anyWord16)
-      parserPackage = Package <$> parser <*> (Utf8Ref <$> anyWord16)
-  encode (Class t (Utf8Ref u)) = encode t <> word16BE u
-  encode (FieldRef t (ClassRef c) (NameAndTypeRef n)) =
-    encode t <> word16BE c <> word16BE n
-  encode (MethodRef t (ClassRef c) (NameAndTypeRef n)) =
-    encode t <> word16BE c <> word16BE n
-  encode (InterfaceMethodRef t (ClassRef c) (NameAndTypeRef n)) =
-    encode t <> word16BE c <> word16BE n
-  encode (String t (Utf8Ref u)) = encode t <> word16BE u
+      parserMethodHandle = MethodHandle <$> parser <*> parser <*> parser
+      parserMethodType = MethodType <$> parser <*> parser
+      parserDynamic = Dynamic <$> parser <*> anyWord16 <*> parser
+      parserInvokeDynamic = InvokeDynamic <$> parser <*> anyWord16 <*> parser
+      parserModule = Module <$> parser <*> parser
+      parserPackage = Package <$> parser <*> parser
+  encode (Class t u) = encode t <> encode u
+  encode (FieldRef t c n) = encode t <> encode c <> encode n
+  encode (MethodRef t c n) = encode t <> encode c <> encode n
+  encode (InterfaceMethodRef t c n) = encode t <> encode c <> encode n
+  encode (String t u) = encode t <> encode u
   encode (Integer t w) = encode t <> word32BE w
   encode (Float t w) = encode t <> word32BE w
   encode (Long t w) = encode t <> word64BE w
   encode (Double t w) = encode t <> word64BE w
-  encode (NameAndType t (Utf8Ref u) (Utf8Ref u')) =
-    encode t <> word16BE u <> word16BE u'
+  encode (NameAndType t u u') = encode t <> encode u <> encode u'
   encode (Utf8 t b) =
-    encode t <> word16BE (fromIntegral (Data.ByteString.length b))
+    encode t
+      <> word16BE (fromIntegral (Data.ByteString.length b))
       <> byteString b
-  encode (MethodHandle t m (ConstantPoolRef c)) =
-    encode t <> encode m <> word16BE c
-  encode (MethodType t (Utf8Ref u)) = encode t <> word16BE u
-  encode (Dynamic t b (NameAndTypeRef n)) = encode t <> word16BE b <> word16BE n
-  encode (InvokeDynamic t b (NameAndTypeRef n)) =
-    encode t <> word16BE b <> word16BE n
-  encode (Module t (Utf8Ref u)) = encode t <> word16BE u
-  encode (Package t (Utf8Ref u)) = encode t <> word16BE u
+  encode (MethodHandle t m c) = encode t <> encode m <> encode c
+  encode (MethodType t u) = encode t <> encode u
+  encode (Dynamic t b n) = encode t <> word16BE b <> encode n
+  encode (InvokeDynamic t b n) = encode t <> word16BE b <> encode n
+  encode (Module t u) = encode t <> encode u
+  encode (Package t u) = encode t <> encode u
 
 -- | Determines the constant pool size of entries. Bytecode has the questionable
 -- feature that 'Double' and 'Long' entries take up two constant pool entry
@@ -481,11 +465,19 @@ newtype ClassRef = ClassRef Word16
 instance Show ClassRef where
   show (ClassRef n) = "#" ++ show n
 
+instance Bytecode ClassRef where
+  parser = ClassRef <$> anyWord16
+  encode (ClassRef c) = word16BE c
+
 -- | Reference to a 'NameAndType' constant.
 newtype NameAndTypeRef = NameAndTypeRef Word16
 
 instance Show NameAndTypeRef where
   show (NameAndTypeRef n) = "#" ++ show n
+
+instance Bytecode NameAndTypeRef where
+  parser = NameAndTypeRef <$> anyWord16
+  encode (NameAndTypeRef n) = word16BE n
 
 -- | Reference to an 'Utf8' constant.
 newtype Utf8Ref = Utf8Ref Word16
@@ -493,11 +485,19 @@ newtype Utf8Ref = Utf8Ref Word16
 instance Show Utf8Ref where
   show (Utf8Ref n) = "#" ++ show n
 
+instance Bytecode Utf8Ref where
+  parser = Utf8Ref <$> anyWord16
+  encode (Utf8Ref u) = word16BE u
+
 -- | General reference to a 'ConstantPoolEntry'.
 newtype ConstantPoolRef = ConstantPoolRef Word16
 
 instance Show ConstantPoolRef where
   show (ConstantPoolRef n) = "#" ++ show n
+
+instance Bytecode ConstantPoolRef where
+  parser = ConstantPoolRef <$> anyWord16
+  encode (ConstantPoolRef c) = word16BE c
 
 -- | Reference to a BootstrapMethod attribute
 type BootstrapMethodAttrRef = Word16 -- TODO: move?

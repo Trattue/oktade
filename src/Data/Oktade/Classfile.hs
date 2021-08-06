@@ -2,9 +2,10 @@
 -- Module      : Data.Oktade.Classfile
 -- License     : Apache-2.0
 --
--- This module contains type definitions regarding the general classfile.
+-- This module contains type definitions and parsers for the general classfile.
 module Data.Oktade.Classfile
-  ( parseClassfile,
+  ( -- * Parsing and Encoding
+    parseClassfile,
     encodeClassfile,
 
     -- * Classfile
@@ -23,11 +24,15 @@ import Data.Oktade.Classfile.ThisClass (ThisClass)
 import Data.Oktade.Classfile.Version (Version)
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
 
--- Temp
+--------------------------------------------------------------------------------
+-- Parsing and Encoding
+--------------------------------------------------------------------------------
+
+-- Parses a 'Classfile' from a 'ByteString'.
 parseClassfile :: ByteString -> Result Classfile
 parseClassfile = parse (parser :: Parser Classfile)
 
--- Temp
+-- Encodes a 'Classfile' to a 'ByteString'
 encodeClassfile :: Classfile -> ByteString
 encodeClassfile c = toLazyByteString $ encode c
 
