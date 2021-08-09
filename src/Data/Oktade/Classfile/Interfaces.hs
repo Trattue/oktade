@@ -1,17 +1,36 @@
-module Data.Oktade.Classfile.Interfaces where
+-- |
+-- Module      : Data.Oktade.Classfile.Interfaces
+-- License     : Apache-2.0
+--
+-- This module contains type definitions and parsers for the classfile
+-- interfaces.
+module Data.Oktade.Classfile.Interfaces
+  ( -- * Interfaces
+    Interfaces (..),
+  )
+where
 
 import Data.Attoparsec.ByteString (count)
 import Data.ByteString.Builder (word16BE)
-import Data.Map (fold)
 import Data.Oktade.Classfile.ConstantPool (ClassRef)
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
 import Data.Oktade.Internal.Parser (anyWord16)
 
+--------------------------------------------------------------------------------
+-- Interfaces
+--------------------------------------------------------------------------------
+
+-- | Represents the classfile interfaces (a list of 'ClassRef's, interfaces on
+-- the constant pool)
+--
+-- JVM spec:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 newtype Interfaces = Interfaces [ClassRef]
 
 instance Show Interfaces where
   show (Interfaces []) = "Interfaces: -"
-  show (Interfaces cs) = "Interfaces:\n" ++ unlines (show <$> cs)
+  show (Interfaces cs) =
+    "Interfaces:\n" ++ init (unlines $ ("  " ++) . show <$> cs)
 
 instance Bytecode Interfaces where
   parser =
