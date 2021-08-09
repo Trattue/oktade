@@ -27,7 +27,7 @@ newtype AccessFlags = AccessFlags [AccessFlag]
 instance Show AccessFlags where
   show (AccessFlags []) = "Access Flags: -"
   show (AccessFlags af) =
-    "Access Flags:\n" ++ init (unlines $ map (("  " ++) . show) af)
+    "Access Flags:\n" ++ init (unlines $ ("  " ++) . show <$> af)
 
 instance Bytecode AccessFlags where
   parser =

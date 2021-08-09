@@ -15,6 +15,7 @@ library
     Data.Oktade.Classfile
     Data.Oktade.Classfile.AccessFlags
     Data.Oktade.Classfile.ConstantPool
+    Data.Oktade.Classfile.Interfaces
     Data.Oktade.Classfile.MagicNumber
     Data.Oktade.Classfile.SuperClass
     Data.Oktade.Classfile.ThisClass

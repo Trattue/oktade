@@ -18,6 +18,7 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (ByteString)
 import Data.Oktade.Classfile.AccessFlags (AccessFlags)
 import Data.Oktade.Classfile.ConstantPool (ConstantPool)
+import Data.Oktade.Classfile.Interfaces (Interfaces)
 import Data.Oktade.Classfile.MagicNumber (MagicNumber)
 import Data.Oktade.Classfile.SuperClass (SuperClass)
 import Data.Oktade.Classfile.ThisClass (ThisClass)
@@ -50,7 +51,8 @@ data Classfile = Classfile
     constantPool :: ConstantPool,
     accessFlags :: AccessFlags,
     thisClass :: ThisClass,
-    superClass :: SuperClass
+    superClass :: SuperClass,
+    interfaces :: Interfaces
   } -- TODO
 
 instance Show Classfile where
@@ -62,12 +64,20 @@ instance Show Classfile where
           show (constantPool c),
           show (accessFlags c),
           show (thisClass c),
-          show (superClass c)
+          show (superClass c),
+          show (interfaces c)
         ]
 
 instance Bytecode Classfile where
   parser =
-    Classfile <$> parser <*> parser <*> parser <*> parser <*> parser <*> parser
+    Classfile
+      <$> parser
+      <*> parser
+      <*> parser
+      <*> parser
+      <*> parser
+      <*> parser
+      <*> parser
   encode c =
     encode (magic c)
       <> encode (version c)
@@ -75,3 +85,4 @@ instance Bytecode Classfile where
       <> encode (accessFlags c)
       <> encode (thisClass c)
       <> encode (superClass c)
+      <> encode (interfaces c)

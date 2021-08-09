@@ -68,7 +68,7 @@ instance Show ConstantPool where
     | otherwise =
       let l = size m
           d = 1 + ceiling (logBase 10 (fromIntegral l))
-       in init $ "Constant Pool:\n" ++ unlines (map (showEntry l d) $ toAscList m)
+       in init $ "Constant Pool:\n" ++ unlines (showEntry l d <$> toAscList m)
     where
       showEntry l d (k, v) =
         printf ("  %" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ show v
