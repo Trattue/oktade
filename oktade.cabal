@@ -14,9 +14,14 @@ library
     Data.Oktade.ByteConstant
     Data.Oktade.Classfile
     Data.Oktade.Classfile.AccessFlags
+    Data.Oktade.Classfile.Attributes
     Data.Oktade.Classfile.ConstantPool
+    Data.Oktade.Classfile.Fields
+    Data.Oktade.Classfile.Fields.AccessFlags
     Data.Oktade.Classfile.Interfaces
     Data.Oktade.Classfile.MagicNumber
+    Data.Oktade.Classfile.Methods
+    Data.Oktade.Classfile.Methods.AccessFlags
     Data.Oktade.Classfile.SuperClass
     Data.Oktade.Classfile.ThisClass
     Data.Oktade.Classfile.Version
@@ -29,7 +34,6 @@ library
 
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
-
   -- Other library packages from which modules are imported.
   build-depends:
     , attoparsec  ^>=0.14.1
@@ -49,10 +53,8 @@ executable oktade
 
   -- Modules included in this executable, other than Main.
   -- other-modules:
-
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:
-
   -- Other library packages from which modules are imported.
   build-depends:
     , attoparsec  ^>=0.14.1

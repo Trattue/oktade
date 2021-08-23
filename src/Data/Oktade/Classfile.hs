@@ -17,9 +17,12 @@ import Data.Attoparsec.ByteString.Lazy (Parser, Result, parse)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (ByteString)
 import Data.Oktade.Classfile.AccessFlags (AccessFlags)
+import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (ConstantPool)
+import Data.Oktade.Classfile.Fields (Fields)
 import Data.Oktade.Classfile.Interfaces (Interfaces)
 import Data.Oktade.Classfile.MagicNumber (MagicNumber)
+import Data.Oktade.Classfile.Methods (Methods)
 import Data.Oktade.Classfile.SuperClass (SuperClass)
 import Data.Oktade.Classfile.ThisClass (ThisClass)
 import Data.Oktade.Classfile.Version (Version)
@@ -52,8 +55,11 @@ data Classfile = Classfile
     accessFlags :: AccessFlags,
     thisClass :: ThisClass,
     superClass :: SuperClass,
-    interfaces :: Interfaces
-  } -- TODO
+    interfaces :: Interfaces,
+    fields :: Fields,
+    methods :: Methods,
+    attributes :: Attributes
+  }
 
 instance Show Classfile where
   show c =
@@ -65,13 +71,19 @@ instance Show Classfile where
           show (accessFlags c),
           show (thisClass c),
           show (superClass c),
-          show (interfaces c)
+          show (interfaces c),
+          show (fields c),
+          show (methods c),
+          show (attributes c)
         ]
 
 instance Bytecode Classfile where
   parser =
     Classfile
       <$> parser
+      <*> parser
+      <*> parser
+      <*> parser
       <*> parser
       <*> parser
       <*> parser
@@ -86,3 +98,6 @@ instance Bytecode Classfile where
       <> encode (thisClass c)
       <> encode (superClass c)
       <> encode (interfaces c)
+      <> encode (fields c)
+      <> encode (methods c)
+      <> encode (attributes c)

@@ -10,7 +10,7 @@ module Data.Oktade.Classfile.Interfaces
   )
 where
 
-import Data.Attoparsec.ByteString (count)
+import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.Classfile.ConstantPool (ClassRef)
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
