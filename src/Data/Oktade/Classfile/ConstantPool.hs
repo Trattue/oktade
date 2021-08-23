@@ -40,12 +40,13 @@ module Data.Oktade.Classfile.ConstantPool
 where
 
 import Data.Attoparsec.ByteString (choice, word8)
-import qualified Data.Attoparsec.ByteString as BS (take)
-import Data.ByteString (ByteString, length)
+import qualified Data.Attoparsec.ByteString as A (take)
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as B (length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE, word64BE)
-import qualified Data.ByteString.Builder as B (byteString, word8)
+import qualified Data.ByteString.Builder as BB (word8)
 import Data.IntMap (IntMap, fromAscList, size, toAscList)
-import Data.Oktade.ByteConstant (ByteStringConstant, Word8Constant (..))
+import Data.Oktade.ByteConstant (Word8Constant (..))
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
 import Data.Oktade.Internal.Parser (anyWord16, anyWord32, anyWord64)
 import Data.Word (Word16, Word32, Word64, Word8)
@@ -105,7 +106,7 @@ instance Word8Constant TClass where
 
 instance Bytecode TClass where
   parser = TClass <$ word8 (value8 TClass)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'FieldRef' constant pool entry.
 data TFieldRef = TFieldRef
@@ -118,7 +119,7 @@ instance Word8Constant TFieldRef where
 
 instance Bytecode TFieldRef where
   parser = TFieldRef <$ word8 (value8 TFieldRef)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'MethodRef' constant pool entry.
 data TMethodRef = TMethodRef
@@ -131,7 +132,7 @@ instance Word8Constant TMethodRef where
 
 instance Bytecode TMethodRef where
   parser = TMethodRef <$ word8 (value8 TMethodRef)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'InterfaceMethodRef' constant pool entry.
 data TInterfaceMethodRef = TInterfaceMethodRef
@@ -144,7 +145,7 @@ instance Word8Constant TInterfaceMethodRef where
 
 instance Bytecode TInterfaceMethodRef where
   parser = TInterfaceMethodRef <$ word8 (value8 TInterfaceMethodRef)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'String' constant pool entry.
 data TString = TString
@@ -157,7 +158,7 @@ instance Word8Constant TString where
 
 instance Bytecode TString where
   parser = TString <$ word8 (value8 TString)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Integer' constant pool entry.
 data TInteger = TInteger
@@ -170,7 +171,7 @@ instance Word8Constant TInteger where
 
 instance Bytecode TInteger where
   parser = TInteger <$ word8 (value8 TInteger)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Float' constant pool entry.
 data TFloat = TFloat
@@ -183,7 +184,7 @@ instance Word8Constant TFloat where
 
 instance Bytecode TFloat where
   parser = TFloat <$ word8 (value8 TFloat)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Long' constant pool entry.
 data TLong = TLong
@@ -196,7 +197,7 @@ instance Word8Constant TLong where
 
 instance Bytecode TLong where
   parser = TLong <$ word8 (value8 TLong)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Double' constant pool entry.
 data TDouble = TDouble
@@ -209,7 +210,7 @@ instance Word8Constant TDouble where
 
 instance Bytecode TDouble where
   parser = TDouble <$ word8 (value8 TDouble)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'NameAndType' constant pool entry.
 data TNameAndType = TNameAndType
@@ -222,7 +223,7 @@ instance Word8Constant TNameAndType where
 
 instance Bytecode TNameAndType where
   parser = TNameAndType <$ word8 (value8 TNameAndType)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Utf8' constant pool entry.
 data TUtf8 = TUtf8
@@ -235,7 +236,7 @@ instance Word8Constant TUtf8 where
 
 instance Bytecode TUtf8 where
   parser = TUtf8 <$ word8 (value8 TUtf8)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'MethodHandle' constant pool entry.
 data TMethodHandle = TMethodHandle
@@ -248,7 +249,7 @@ instance Word8Constant TMethodHandle where
 
 instance Bytecode TMethodHandle where
   parser = TMethodHandle <$ word8 (value8 TMethodHandle)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'MethodType' constant pool entry.
 data TMethodType = TMethodType
@@ -261,7 +262,7 @@ instance Word8Constant TMethodType where
 
 instance Bytecode TMethodType where
   parser = TMethodType <$ word8 (value8 TMethodType)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Dynamic' constant pool entry.
 data TDynamic = TDynamic
@@ -274,7 +275,7 @@ instance Word8Constant TDynamic where
 
 instance Bytecode TDynamic where
   parser = TDynamic <$ word8 (value8 TDynamic)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'InvokeDynamic' constant pool entry.
 data TInvokeDynamic = TInvokeDynamic
@@ -287,7 +288,7 @@ instance Word8Constant TInvokeDynamic where
 
 instance Bytecode TInvokeDynamic where
   parser = TInvokeDynamic <$ word8 (value8 TInvokeDynamic)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Module' constant pool entry.
 data TModule = TModule
@@ -300,7 +301,7 @@ instance Word8Constant TModule where
 
 instance Bytecode TModule where
   parser = TModule <$ word8 (value8 TModule)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 -- | Tag for the 'Package' constant pool entry.
 data TPackage = TPackage
@@ -313,7 +314,7 @@ instance Word8Constant TPackage where
 
 instance Bytecode TPackage where
   parser = TPackage <$ word8 (value8 TPackage)
-  encode t = B.word8 $ value8 t
+  encode t = BB.word8 $ value8 t
 
 --------------------------------------------------------------------------------
 -- Constant Pool Entries
@@ -402,7 +403,7 @@ instance Bytecode ConstantPoolEntry where
       parserUtf8 =
         Utf8 <$> parser <*> do
           length <- anyWord16
-          BS.take (fromIntegral length)
+          A.take (fromIntegral length)
       parserMethodHandle = MethodHandle <$> parser <*> parser <*> parser
       parserMethodType = MethodType <$> parser <*> parser
       parserDynamic = Dynamic <$> parser <*> anyWord16 <*> parser
@@ -421,7 +422,7 @@ instance Bytecode ConstantPoolEntry where
   encode (NameAndType t u u') = encode t <> encode u <> encode u'
   encode (Utf8 t b) =
     encode t
-      <> word16BE (fromIntegral (Data.ByteString.length b))
+      <> word16BE (fromIntegral (B.length b))
       <> byteString b
   encode (MethodHandle t m c) = encode t <> encode m <> encode c
   encode (MethodType t u) = encode t <> encode u
@@ -498,7 +499,7 @@ instance Bytecode MethodRefKind where
       parserNewInvokeSpecial =
         NewInvokeSpecial <$ word8 (value8 NewInvokeSpecial)
       parserInvokeInterface = InvokeInterface <$ word8 (value8 InvokeInterface)
-  encode m = B.word8 $ value8 m
+  encode m = BB.word8 $ value8 m
 
 --------------------------------------------------------------------------------
 -- References

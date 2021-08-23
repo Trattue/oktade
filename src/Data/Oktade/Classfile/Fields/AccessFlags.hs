@@ -11,7 +11,6 @@ module Data.Oktade.Classfile.Fields.AccessFlags
   )
 where
 
-import Data.Attoparsec.Internal.Types (State)
 import Data.Bits (Bits ((.|.)), (.&.))
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.ByteConstant (Word16Constant (..))

@@ -6,8 +6,10 @@
 -- attributes.
 module Data.Oktade.Classfile.Attributes where
 
-import qualified Data.Attoparsec.ByteString as A (count, take)
-import qualified Data.ByteString as BS (ByteString, length)
+import Data.Attoparsec.ByteString.Lazy (count)
+import qualified Data.Attoparsec.ByteString.Lazy as A (take)
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as BS (length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
@@ -29,12 +31,12 @@ instance Bytecode Attributes where
   parser =
     Attributes <$> do
       attributeCount <- anyWord16
-      A.count (fromIntegral attributeCount) parser
+      count (fromIntegral attributeCount) parser
   encode (Attributes as) =
     word16BE (fromIntegral $ length as) <> foldr ((<>) . encode) mempty as
 
 -- | A single attribute.
-data Attribute = Unknown Utf8Ref BS.ByteString
+data Attribute = Unknown Utf8Ref ByteString
 
 instance Show Attribute where
   show (Unknown u b) = "Unknown " ++ show u ++ " " ++ show b
@@ -44,4 +46,5 @@ instance Bytecode Attribute where
     Unknown <$> parser <*> do
       attributeSize <- anyWord32
       A.take (fromIntegral attributeSize)
-  encode (Unknown u b) = encode u <> word32BE (fromIntegral $ BS.length b) <> byteString b
+  encode (Unknown u b) =
+    encode u <> word32BE (fromIntegral $ BS.length b) <> byteString b

@@ -11,11 +11,9 @@ module Data.Oktade.Classfile.MagicNumber
 where
 
 import Data.Attoparsec.ByteString.Lazy (string)
-import Data.ByteString.Builder (byteString, byteStringHex, toLazyByteString)
-import Data.Char (toUpper)
+import Data.ByteString.Builder (byteString)
 import Data.Oktade.ByteConstant (ByteStringConstant (..))
 import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Numeric (showHex)
 
 --------------------------------------------------------------------------------
 -- Magic Number

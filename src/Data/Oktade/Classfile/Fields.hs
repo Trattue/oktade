@@ -11,7 +11,7 @@ module Data.Oktade.Classfile.Fields
   )
 where
 
-import Data.Attoparsec.ByteString.Lazy (count, parse)
+import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)

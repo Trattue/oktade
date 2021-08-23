@@ -12,7 +12,7 @@ module Data.Oktade.ByteConstant
 where
 
 import Data.ByteString (ByteString, pack)
-import Data.Word (Word16, Word32, Word8)
+import Data.Word (Word16, Word8)
 
 --------------------------------------------------------------------------------
 -- Constant Types

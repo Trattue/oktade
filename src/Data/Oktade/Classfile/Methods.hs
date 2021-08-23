@@ -3,9 +3,14 @@
 -- License     : Apache-2.0
 --
 -- This module contains type definitions and parsers for the classfile methods.
-module Data.Oktade.Classfile.Methods where
+module Data.Oktade.Classfile.Methods
+  ( -- * Methods
+    Methods (..),
+    Method (..),
+  )
+where
 
-import Data.Attoparsec.ByteString.Lazy (Parser, count, parse)
+import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)
