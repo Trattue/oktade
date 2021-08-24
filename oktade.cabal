@@ -33,7 +33,8 @@ library
     Data.Oktade.Internal.Parser
 
   -- LANGUAGE extensions used by modules in this package.
-  -- other-extensions:
+  other-extensions: MultiParamTypeClasses
+
   -- Other library packages from which modules are imported.
   build-depends:
     , attoparsec  ^>=0.14.1
@@ -60,6 +61,8 @@ executable oktade
     , attoparsec  ^>=0.14.1
     , base        ^>=4.14.2.0
     , bytestring  ^>=0.11.1.0
+    , directory   ^>=1.3.6.2
+    , filepath    ^>=1.4.2.1
     , oktade
 
   -- Directories containing source files.

@@ -1,26 +1,35 @@
 module Main where
 
+import Control.Monad (forM_, unless)
 import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
 import Data.ByteString.Lazy as BS (isPrefixOf, readFile, stripSuffix)
+import Data.List (isSuffixOf)
 import Data.Oktade.Classfile (encodeClassfile, parseClassfile)
+import System.Directory (doesFileExist, getCurrentDirectory, listDirectory)
+import System.FilePath ((</>))
 
 main :: IO ()
-main = do
-  classfile <- BS.readFile "test.class"
-  case parseClassfile classfile of
-    Fail i c e -> do
-      putStr "Parsing failed! Error: "
-      print e
-      putStrLn "Remaining input:"
-      print i
-    Done i r -> do
-      putStrLn ""
-      print r
-      putStr "\nTesting homomorphism... "
-      let encoded = encodeClassfile r
-      if encoded `isPrefixOf` classfile
-        then putStrLn "success!"
-        else putStrLn "failed!"
-  -- putStrLn $
-  --   "Generated output:\n" ++ show encoded ++ "\nInput:\n" ++ show classfile
-  return ()
+main = test
+
+test :: IO ()
+test = do
+  dir <- getCurrentDirectory
+  let testDir = dir </> "tests"
+  walk testDir
+  where
+    walk path = do
+      content <- listDirectory path
+      forM_ ((path </>) <$> content) walk'
+    walk' p = do
+      isFile <- doesFileExist p
+      if isFile && ".class" `isSuffixOf` p
+        then
+          ( do
+              classfile <- BS.readFile p
+              case parseClassfile classfile of
+                Fail i c e -> putStrLn $ show p ++ "... Failed!"
+                Done i r -> do
+                  -- print r
+                  putStrLn $ show p ++ "... Success!"
+          )
+        else unless isFile $ do walk p
