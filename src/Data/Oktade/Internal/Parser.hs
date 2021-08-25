@@ -40,6 +40,6 @@ anyWord32 = anyWordN 32 anyWord16
 
 -- | Parser matching any 'Word64'.
 --
--- Similar to 'anyWord8' in the attoparsec library, but for 'Word32's.
+-- Similar to 'anyWord8' in the attoparsec library, but for 'Word64's.
 anyWord64 :: Parser Word64
 anyWord64 = anyWordN 64 anyWord32
