@@ -2,9 +2,10 @@
 -- Module      : Data.Oktade.Classfile
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the general classfile.
+-- Type definitions and parsers/encoders for the general classfile.
 module Data.Oktade.Classfile
   ( -- * Parsing and Encoding
+    -- $parsing_and_encoding
     parseClassfile,
     encodeClassfile,
 
@@ -16,6 +17,7 @@ where
 import Data.Attoparsec.ByteString.Lazy (Parser, Result, parse)
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (ByteString)
+import Data.List (intercalate)
 import Data.Oktade.Classfile.AccessFlags (AccessFlags)
 import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (ConstantPool)
@@ -32,11 +34,52 @@ import Data.Oktade.Internal.Bytecode (Bytecode (..))
 -- Parsing and Encoding
 --------------------------------------------------------------------------------
 
--- Parses a 'Classfile' from a 'ByteString'.
+-- $parsing_and_encoding
+--
+-- Behind the scenes, oktade uses the attoparsec parser combinator library for
+-- parsing classfiles. Oktade, however, hides most implementation details of the
+-- actual parsing and encoding for the library user. This section defines a top
+-- level interface for using oktade's parsers and encoders.
+--
+-- Oktade is able to translate a given 'ByteString', defined by the bytestring
+-- library, to a data structure representing a classfile ('Classfile') and
+-- encode this data structure back to a 'ByteString'. Both parsing and encoding
+-- happen in a lazy manner. To indicate parser failure, oktade simply uses
+-- attoparsec's 'Result' type.
+--
+-- Example usage for reading a classfile and printing its parsed content:
+--
+-- >import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
+-- >import Data.ByteString.Lazy as BS (readFile)
+-- >import Data.Oktade.Classfile (encodeClassfile, parseClassfile)
+-- >
+-- >printClassfile :: FilePath -> IO ()
+-- >printClassfile p = do
+-- >  classfile <- BS.readFile p
+-- >  case parseClassfile classfile of
+-- >    Fail _ _ e -> putStrLn $ show p ++ " could not be parsed! Error: " ++ e
+-- >    Done _ r ->
+-- >      putStrLn $ show p ++ " successfully parsed! Result:\n" ++ show r
+
+-- | Parses a 'Classfile' from a lazy 'ByteString'. Returns a 'Result' (defined
+-- in the attoparsec library) to indicate successful parsing ('Done') or failure
+-- ('Fail'). See the attoparsec documentation for more information about the
+-- 'Result' type.
+--
+-- Note that any data after the actual classfile will be ignored by the parser
+-- and returned as remaining input in the the 'Result' type.
 parseClassfile :: ByteString -> Result Classfile
 parseClassfile = parse (parser :: Parser Classfile)
 
--- Encodes a 'Classfile' to a 'ByteString'
+-- | Encodes a 'Classfile' to a lazy 'ByteString'. The resulting 'ByteString'
+-- will exactly match the consumed input 'ByteString' (assuming the 'Classfile'
+-- wasn't modified):
+--
+-- >>> let (Done _ result) = parseClassfile classfile
+-- >>> encodeClassfile result `isPrefixOf` classfile
+-- True
+--
+-- Note: Classfiles are encoded in Big Endian.
 encodeClassfile :: Classfile -> ByteString
 encodeClassfile c = toLazyByteString $ encode c
 
@@ -44,9 +87,10 @@ encodeClassfile c = toLazyByteString $ encode c
 -- Classfile
 --------------------------------------------------------------------------------
 
--- | Data structure for the whole classfile.
+-- | Data structure for the whole classfile. The structure of this type follows
+-- closely the overall structure of the classfile format.
 --
--- JVM spec:
+-- The structure of the classfile format can be understood reading the JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data Classfile = Classfile
   { magic :: MagicNumber,
@@ -63,19 +107,19 @@ data Classfile = Classfile
 
 instance Show Classfile where
   show c =
-    init $
-      unlines
-        [ show (magic c),
-          show (version c),
-          show (constantPool c),
-          show (accessFlags c),
-          show (thisClass c),
-          show (superClass c),
-          show (interfaces c),
-          show (fields c),
-          show (methods c),
-          show (attributes c)
-        ]
+    let components =
+          [ show (magic c),
+            show (version c),
+            show (constantPool c),
+            show (accessFlags c),
+            show (thisClass c),
+            show (superClass c),
+            show (interfaces c),
+            show (fields c),
+            show (methods c),
+            show (attributes c)
+          ]
+     in intercalate "\n" components
 
 instance Bytecode Classfile where
   parser =

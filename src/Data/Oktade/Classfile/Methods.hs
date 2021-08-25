@@ -2,7 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Methods
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile methods.
+-- Type definitions for the classfile methods.
 module Data.Oktade.Classfile.Methods
   ( -- * Methods
     Methods (..),
@@ -23,6 +23,9 @@ import Data.Oktade.Internal.Parser (anyWord16)
 --------------------------------------------------------------------------------
 
 -- | Represents the list of methods a classfile has.
+--
+-- Read the JVM spec for more information:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.6
 newtype Methods = Methods [Method]
 
 instance Show Methods where

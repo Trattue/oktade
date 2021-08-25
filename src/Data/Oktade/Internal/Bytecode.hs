@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Internal.Bytecode
 -- License     : Apache-2.0
 --
--- This module contains type class definitions regarding bytecode data type
--- conversions.
+-- Type class definitions regarding bytecode data type conversions.
 module Data.Oktade.Internal.Bytecode
   ( -- * Type Conversion
     Bytecode (..),

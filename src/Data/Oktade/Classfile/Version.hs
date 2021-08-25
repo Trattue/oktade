@@ -2,7 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Version
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile version.
+-- Type definitions for the classfile version.
 module Data.Oktade.Classfile.Version
   ( -- * Version
     Version (..),
@@ -21,9 +21,10 @@ import Data.Word (Word16)
 --------------------------------------------------------------------------------
 
 -- | The classfile version.
+--
 -- Note: In the actual classfile, the minor version is before the major version.
 --
--- JVM spec:
+-- More about the classfile version can be learned in the JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data Version = Version Major Minor
 
@@ -34,7 +35,7 @@ instance Show Version where
 type Major = Word16
 
 -- | The classfile minor version. Major versions above 55 set some restrictions
--- on the minor version, see the JVM spec.
+-- on the minor version; read the JVM spec for more information.
 type Minor = Word16
 
 instance Bytecode Version where

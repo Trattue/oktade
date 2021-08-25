@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.SuperClass
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile super
--- class.
+-- Type definitions for the classfile super class.
 module Data.Oktade.Classfile.SuperClass
   ( -- * Super Class
     SuperClass (..),

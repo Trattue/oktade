@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.ThisClass
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile this
--- class.
+-- Type definitions for the classfile this class.
 module Data.Oktade.Classfile.ThisClass
   ( -- * This Class
     ThisClass (..),

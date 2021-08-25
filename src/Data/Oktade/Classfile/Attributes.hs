@@ -2,9 +2,12 @@
 -- Module      : Data.Oktade.Classfile.Attributes
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile
--- attributes.
-module Data.Oktade.Classfile.Attributes where
+-- Type definitions for the classfile attributes.
+module Data.Oktade.Classfile.Attributes
+  ( Attributes (..),
+    Attribute (..),
+  )
+where
 
 import Data.Attoparsec.ByteString.Lazy (count)
 import qualified Data.Attoparsec.ByteString.Lazy as A (take)

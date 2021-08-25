@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Fields.AccessFlags
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the access flags of
--- classfile fields.
+-- Type definitions for the access flags of classfile fields.
 module Data.Oktade.Classfile.Fields.AccessFlags
   ( -- * Access Flags
     AccessFlags (..),

@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Interfaces
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile
--- interfaces.
+-- Type definitions for the classfile interfaces.
 module Data.Oktade.Classfile.Interfaces
   ( -- * Interfaces
     Interfaces (..),
@@ -23,7 +22,7 @@ import Data.Oktade.Internal.Parser (anyWord16)
 -- | Represents the classfile interfaces (a list of 'ClassRef's, interfaces on
 -- the constant pool)
 --
--- JVM spec:
+-- Read the JVM spec for more information:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 newtype Interfaces = Interfaces [ClassRef]
 

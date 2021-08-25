@@ -2,10 +2,10 @@
 -- Module      : Data.Oktade.Classfile.ConstantPool
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile constant
--- pool and its entries.
+-- Type definitions for the classfile constant pool and its entries.
 module Data.Oktade.Classfile.ConstantPool
   ( -- * Constant Pool
+    -- $contant-pool
     ConstantPool (..),
 
     -- ** Constant Pool Tags
@@ -28,9 +28,10 @@ module Data.Oktade.Classfile.ConstantPool
 
     -- ** Constant Pool Entries
     ConstantPoolEntry (..),
+    constantPoolSize,
     MethodRefKind (..),
 
-    -- ** References
+    -- *** References
     ClassRef (..),
     NameAndTypeRef (..),
     Utf8Ref (..),
@@ -56,10 +57,24 @@ import Text.Printf (printf)
 -- Constant Pool
 --------------------------------------------------------------------------------
 
+-- $contant-pool
+-- The constant pool is arguably one of the larger structures in the classfile,
+-- as such the corresponding data structures may seem a bit overwhelming at
+-- first.
+--
+-- As a top level overview, the constant pool is a map of indices to entries
+-- (here: 'ConstantPool').
+--
+-- Each entry has a specific tag which allows parsers to determine which kind of
+-- entry it should parse. These constants are described in the
+-- __Contant Pool Tags__ section.
+--
+-- The actual constant pool entries are represented as 'ConstantPoolEntry's.
+
 -- | Represents the classfile constant pool which is a list of
 -- 'ConstantPoolEntry's mapped to their indices.
 --
--- JVM spec:
+-- More about the constant pool can be learned in the JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
 newtype ConstantPool = ConstantPool (IntMap ConstantPoolEntry)
 
@@ -68,19 +83,25 @@ instance Show ConstantPool where
     | null m = "Constant Pool: -"
     | otherwise =
       let l = size m
+          -- Number of digits of the largest constant pool entry index.
           d = 1 + ceiling (logBase 10 (fromIntegral l))
        in init $ "Constant Pool:\n" ++ unlines (showEntry l d <$> toAscList m)
     where
+      -- Right aligned formatting considering the maximum number of digits.
       showEntry l d (k, v) =
         printf ("  %" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ show v
 
 instance Bytecode ConstantPool where
   parser = do
     entryCountPlusOne <- anyWord16
+    -- Yes, this is correct. For some reason, the classfile stores the constant
+    -- pool size + 1.
     let entryCount = fromIntegral entryCountPlusOne - 1
     entries <- countC entryCount 1 parser []
     return $ ConstantPool $ fromAscList entries
     where
+      -- Custom 'count' function for considering the 'constantPoolSize' of
+      -- entries.
       countC c n p acc
         | n > c = return acc
         | otherwise = do
@@ -89,6 +110,8 @@ instance Bytecode ConstantPool where
   encode (ConstantPool m) =
     word16BE (fromIntegral (sizeC m + 1)) <> foldr ((<>) . encode) mempty m
     where
+      -- Custom 'size' function for considering the 'constantPoolSize' of
+      -- entries.
       sizeC m = foldr ((+) . constantPoolSize) 0 m
 
 --------------------------------------------------------------------------------
@@ -439,29 +462,20 @@ constantPoolSize (Double _ _) = 2
 constantPoolSize (Long _ _) = 2
 constantPoolSize _ = 1
 
--- | Types of methof references used by 'MethodHandle's.
+-- | Types of method references used by 'MethodHandle's.
 --
--- JVM spec:
+-- Read the JVM spec for more information:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-5.html#jvms-5.4.3.5
 data MethodRefKind
-  = -- | TODO
-    GetField
-  | -- | TODO
-    GetStatic
-  | -- | TODO
-    PutField
-  | -- | TODO
-    PutStatic
-  | -- | TODO
-    InvokeVirtual
-  | -- | TODO
-    InvokeStatic
-  | -- | TODO
-    InvokeSpecial
-  | -- | TODO
-    NewInvokeSpecial
-  | -- | TODO
-    InvokeInterface
+  = GetField
+  | GetStatic
+  | PutField
+  | PutStatic
+  | InvokeVirtual
+  | InvokeStatic
+  | InvokeSpecial
+  | NewInvokeSpecial
+  | InvokeInterface
   deriving (Show)
 
 instance Word8Constant MethodRefKind where
@@ -545,5 +559,5 @@ instance Bytecode ConstantPoolRef where
   parser = ConstantPoolRef <$> anyWord16
   encode (ConstantPoolRef c) = word16BE c
 
--- | Reference to a BootstrapMethod attribute
-type BootstrapMethodAttrRef = Word16 -- TODO: move?
+-- | Reference to a BootstrapMethod attribute.
+type BootstrapMethodAttrRef = Word16 -- TODO: where does this belong to?

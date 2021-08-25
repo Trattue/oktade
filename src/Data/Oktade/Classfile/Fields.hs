@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.Fields
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile
--- fields.
+-- Type definitions for the classfile fields.
 module Data.Oktade.Classfile.Fields
   ( -- * Fields
     Fields (..),
@@ -24,6 +23,9 @@ import Data.Oktade.Internal.Parser (anyWord16)
 --------------------------------------------------------------------------------
 
 -- | Represents the list of fields a classfile has.
+--
+-- Read the JVM spec for more information:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.5
 newtype Fields = Fields [Field]
 
 instance Show Fields where

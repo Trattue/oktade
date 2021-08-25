@@ -2,7 +2,7 @@
 -- Module      : Data.Oktade.Internal.Parser
 -- License     : Apache-2.0
 --
--- This module contains helper functions for parsing 16, 32, 64 bit words.
+-- Auxiliary parsers for parsing 16, 32 and 64 bit words.
 module Data.Oktade.Internal.Parser
   ( -- * Parsers
     anyWord16,
@@ -12,27 +12,34 @@ module Data.Oktade.Internal.Parser
 where
 
 import Data.Attoparsec.ByteString.Lazy (Parser, anyWord8)
-import Data.Bits (shiftL)
+import Data.Bits (Bits, shiftL)
 import Data.Word (Word16, Word32, Word64)
 
 --------------------------------------------------------------------------------
 -- Parsers
 --------------------------------------------------------------------------------
 
--- | Parser matching any 'Word16'.
-anyWord16 :: Parser Word16
-anyWord16 = toWord16 <$> anyWord8 <*> anyWord8
+-- | General 'WordN' 'Parser'. Takes as arguments the amaount of bits the
+-- word will have and a 'Parser' for the word with n / s bits.
+anyWordN :: (Integral a, Bits b, Num b) => Int -> Parser a -> Parser b
+anyWordN n anyWordHalfN = toWord n <$> anyWordHalfN <*> anyWordHalfN
   where
-    toWord16 w1 w2 = (fromIntegral w1 `shiftL` 8) + fromIntegral w2
+    toWord n w1 w2 = (fromIntegral w1 `shiftL` (n `div` 2)) + fromIntegral w2
+
+-- | Parser matching any 'Word16'.
+--
+-- Similar to 'anyWord8' in the attoparsec library, but for 'Word16's.
+anyWord16 :: Parser Word16
+anyWord16 = anyWordN 16 anyWord8
 
 -- | Parser matching any 'Word32'.
+--
+-- Similar to 'anyWord8' in the attoparsec library, but for 'Word32's.
 anyWord32 :: Parser Word32
-anyWord32 = toWord32 <$> anyWord16 <*> anyWord16
-  where
-    toWord32 w1 w2 = (fromIntegral w1 `shiftL` 16) + fromIntegral w2
+anyWord32 = anyWordN 32 anyWord16
 
 -- | Parser matching any 'Word64'.
+--
+-- Similar to 'anyWord8' in the attoparsec library, but for 'Word32's.
 anyWord64 :: Parser Word64
-anyWord64 = toWord64 <$> anyWord32 <*> anyWord32
-  where
-    toWord64 w1 w2 = (fromIntegral w1 `shiftL` 32) + fromIntegral w2
+anyWord64 = anyWordN 64 anyWord32

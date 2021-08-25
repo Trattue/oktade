@@ -2,8 +2,7 @@
 -- Module      : Data.Oktade.Classfile.MagicNumber
 -- License     : Apache-2.0
 --
--- This module contains type definitions and parsers for the classfile magic
--- number.
+-- Type definitions for the classfile magic number.
 module Data.Oktade.Classfile.MagicNumber
   ( -- * Magic Number
     MagicNumber (..),
@@ -21,7 +20,7 @@ import Data.Oktade.Internal.Bytecode (Bytecode (..))
 
 -- | The classfile magic number, 0xCAFEBABE.
 --
--- JVM spec:
+-- More about the magic number can be learned in the JVM spec:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data MagicNumber = Cafebabe
   deriving (Eq)
