@@ -6,7 +6,7 @@ where
 import Control.Applicative (liftA)
 import Control.Monad (forM, forM_, replicateM_, unless)
 import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
-import Data.ByteString.Lazy as BS (readFile)
+import qualified Data.ByteString.Lazy as BS (readFile)
 import Data.List (isSuffixOf)
 import Data.Oktade.Classfile (parseClassfile)
 import System.Clock (Clock (Monotonic), diffTimeSpec, getTime, toNanoSecs)
