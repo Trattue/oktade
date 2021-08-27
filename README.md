@@ -16,6 +16,32 @@ need to be done:
 * Profile and improve performace, if necessary.
 * Learn more Haskell and improve code quality.
 
+## Usage
+
+The main executable can be used in a similar fashion to `javap`: Run
+`./oktade <classfile>` to have the parsed classfile printed out.
+
+## Development
+### Prerequisites
+
+A working installation of Haskell (GHC 8.10.5) and cabal. The easiest way of
+achieving that is using [GHCup](https://www.haskell.org/ghcup/).
+
+### Development Environment Setup
+
+Clone this project via `git clone https://github.com/Trattue/oktade` or using
+your git client.
+
+### Building and Testing
+
+Run `cabal build` to produce executables of all targets. This will produce
+executables of the main application, the test application and the benchmark
+application.
+
+For testing, run `cabal test` afterwards.
+
+For benchmarking, run `cabal bench` afterwards.
+
 ## License
 
 Copyright 2021 Trattue
