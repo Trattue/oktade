@@ -13,8 +13,8 @@ where
 import Data.Bits (Bits ((.&.), (.|.)))
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.ByteConstant (Word16Constant (..))
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.ByteParser (anyWord16)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Access Flags
@@ -28,7 +28,7 @@ instance Show AccessFlags where
   show (AccessFlags af) =
     "Access Flags:\n" ++ init (unlines $ ("  " ++) . show <$> af)
 
-instance Bytecode AccessFlags where
+instance Component AccessFlags where
   parser =
     let flags =
           [ Public,

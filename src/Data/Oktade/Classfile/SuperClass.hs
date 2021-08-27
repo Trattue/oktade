@@ -10,9 +10,9 @@ module Data.Oktade.Classfile.SuperClass
 where
 
 import Data.ByteString.Builder (word16BE)
+import Data.Oktade.ByteParser (anyWord16)
 import Data.Oktade.Classfile.ConstantPool (ClassRef (ClassRef))
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Super Class
@@ -26,7 +26,7 @@ instance Show SuperClass where
   show Object = "Super class: Object"
   show (SuperClass c) = "Super class: " ++ show c
 
-instance Bytecode SuperClass where
+instance Component SuperClass where
   parser = do
     super <- anyWord16
     return $ if super == 0 then Object else SuperClass $ ClassRef super

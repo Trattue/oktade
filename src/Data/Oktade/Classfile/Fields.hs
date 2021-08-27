@@ -12,11 +12,11 @@ where
 
 import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
+import Data.Oktade.ByteParser (anyWord16)
 import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)
 import Data.Oktade.Classfile.Fields.AccessFlags (AccessFlags)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Fields
@@ -34,7 +34,7 @@ instance Show Fields where
     "Fields:\n"
       ++ init (unlines $ (init . unlines . (("  " ++) <$>) . lines) . show <$> fs)
 
-instance Bytecode Fields where
+instance Component Fields where
   parser =
     Fields <$> do
       fieldCount <- anyWord16
@@ -56,6 +56,6 @@ instance Show Field where
       ++ "\n"
       ++ init (unlines $ ("  " ++) <$> lines (show as))
 
-instance Bytecode Field where
+instance Component Field where
   parser = Field <$> parser <*> parser <*> parser <*> parser
   encode (Field a u u' as) = encode a <> encode u <> encode u' <> encode as

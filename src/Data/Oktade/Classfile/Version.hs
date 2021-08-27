@@ -12,8 +12,8 @@ module Data.Oktade.Classfile.Version
 where
 
 import Data.ByteString.Builder (word16BE)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.ByteParser (anyWord16)
+import Data.Oktade.Component (Component (..))
 import Data.Word (Word16)
 
 --------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ type Major = Word16
 -- on the minor version; read the JVM spec for more information.
 type Minor = Word16
 
-instance Bytecode Version where
+instance Component Version where
   parser = do
     minor <- anyWord16
     major <- anyWord16

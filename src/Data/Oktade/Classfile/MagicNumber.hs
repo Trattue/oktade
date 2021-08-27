@@ -12,7 +12,7 @@ where
 import Data.Attoparsec.ByteString.Lazy (string)
 import Data.ByteString.Builder (byteString)
 import Data.Oktade.ByteConstant (ByteStringConstant (..))
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Magic Number
@@ -31,6 +31,6 @@ instance Show MagicNumber where
 instance ByteStringConstant MagicNumber where
   rawValue Cafebabe = [0xCA, 0xFE, 0xBA, 0xBE]
 
-instance Bytecode MagicNumber where
+instance Component MagicNumber where
   parser = Cafebabe <$ string (value Cafebabe)
   encode m = byteString $ value m

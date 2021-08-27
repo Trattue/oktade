@@ -12,11 +12,11 @@ where
 
 import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
+import Data.Oktade.ByteParser (anyWord16)
 import Data.Oktade.Classfile.Attributes (Attributes)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)
 import Data.Oktade.Classfile.Methods.AccessFlags (AccessFlags)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Methods
@@ -32,7 +32,7 @@ instance Show Methods where
   show (Methods []) = "Methods: -"
   show (Methods ms) = "Methods:\n" ++ init (unlines $ (init . unlines . (("  " ++) <$>) . lines) . show <$> ms)
 
-instance Bytecode Methods where
+instance Component Methods where
   parser =
     Methods <$> do
       methodCount <- anyWord16
@@ -54,6 +54,6 @@ instance Show Method where
       ++ "\n"
       ++ init (unlines $ ("  " ++) <$> lines (show as))
 
-instance Bytecode Method where
+instance Component Method where
   parser = Method <$> parser <*> parser <*> parser <*> parser
   encode (Method a u u' as) = encode a <> encode u <> encode u' <> encode as

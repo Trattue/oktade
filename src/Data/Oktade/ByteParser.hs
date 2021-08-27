@@ -1,9 +1,9 @@
 -- |
--- Module      : Data.Oktade.Internal.Parser
+-- Module      : Data.Oktade.ByteParser
 -- License     : Apache-2.0
 --
 -- Auxiliary parsers for parsing 16, 32 and 64 bit words.
-module Data.Oktade.Internal.Parser
+module Data.Oktade.ByteParser
   ( -- * Parsers
     anyWord16,
     anyWord32,

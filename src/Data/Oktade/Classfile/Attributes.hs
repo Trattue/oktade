@@ -14,9 +14,9 @@ import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS (length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE)
+import Data.Oktade.ByteParser (anyWord16, anyWord32)
 import Data.Oktade.Classfile.ConstantPool (Utf8Ref)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16, anyWord32)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Attributes
@@ -30,7 +30,7 @@ instance Show Attributes where
   show (Attributes as) =
     "Attributes:\n" ++ init (unlines $ ("  " ++) . show <$> as)
 
-instance Bytecode Attributes where
+instance Component Attributes where
   parser =
     Attributes <$> do
       attributeCount <- anyWord16
@@ -44,7 +44,7 @@ data Attribute = Unknown Utf8Ref ByteString
 instance Show Attribute where
   show (Unknown u b) = "Unknown " ++ show u ++ " " ++ show b
 
-instance Bytecode Attribute where
+instance Component Attribute where
   parser =
     Unknown <$> parser <*> do
       attributeSize <- anyWord32

@@ -48,8 +48,8 @@ import Data.ByteString.Builder (byteString, word16BE, word32BE, word64BE)
 import qualified Data.ByteString.Builder as BB (word8)
 import Data.IntMap (IntMap, fromAscList, size, toAscList)
 import Data.Oktade.ByteConstant (Word8Constant (..))
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16, anyWord32, anyWord64)
+import Data.Oktade.ByteParser (anyWord16, anyWord32, anyWord64)
+import Data.Oktade.Component (Component (..))
 import Data.Word (Word16, Word32, Word64, Word8)
 import Text.Printf (printf)
 
@@ -91,7 +91,7 @@ instance Show ConstantPool where
       showEntry l d (k, v) =
         printf ("  %" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ show v
 
-instance Bytecode ConstantPool where
+instance Component ConstantPool where
   parser = do
     entryCountPlusOne <- anyWord16
     -- Yes, this is correct. For some reason, the classfile stores the constant
@@ -127,7 +127,7 @@ instance Show TClass where
 instance Word8Constant TClass where
   value8 TClass = 7
 
-instance Bytecode TClass where
+instance Component TClass where
   parser = TClass <$ word8 (value8 TClass)
   encode t = BB.word8 $ value8 t
 
@@ -140,7 +140,7 @@ instance Show TFieldRef where
 instance Word8Constant TFieldRef where
   value8 TFieldRef = 9
 
-instance Bytecode TFieldRef where
+instance Component TFieldRef where
   parser = TFieldRef <$ word8 (value8 TFieldRef)
   encode t = BB.word8 $ value8 t
 
@@ -153,7 +153,7 @@ instance Show TMethodRef where
 instance Word8Constant TMethodRef where
   value8 TMethodRef = 10
 
-instance Bytecode TMethodRef where
+instance Component TMethodRef where
   parser = TMethodRef <$ word8 (value8 TMethodRef)
   encode t = BB.word8 $ value8 t
 
@@ -166,7 +166,7 @@ instance Show TInterfaceMethodRef where
 instance Word8Constant TInterfaceMethodRef where
   value8 TInterfaceMethodRef = 11
 
-instance Bytecode TInterfaceMethodRef where
+instance Component TInterfaceMethodRef where
   parser = TInterfaceMethodRef <$ word8 (value8 TInterfaceMethodRef)
   encode t = BB.word8 $ value8 t
 
@@ -179,7 +179,7 @@ instance Show TString where
 instance Word8Constant TString where
   value8 TString = 8
 
-instance Bytecode TString where
+instance Component TString where
   parser = TString <$ word8 (value8 TString)
   encode t = BB.word8 $ value8 t
 
@@ -192,7 +192,7 @@ instance Show TInteger where
 instance Word8Constant TInteger where
   value8 TInteger = 3
 
-instance Bytecode TInteger where
+instance Component TInteger where
   parser = TInteger <$ word8 (value8 TInteger)
   encode t = BB.word8 $ value8 t
 
@@ -205,7 +205,7 @@ instance Show TFloat where
 instance Word8Constant TFloat where
   value8 TFloat = 4
 
-instance Bytecode TFloat where
+instance Component TFloat where
   parser = TFloat <$ word8 (value8 TFloat)
   encode t = BB.word8 $ value8 t
 
@@ -218,7 +218,7 @@ instance Show TLong where
 instance Word8Constant TLong where
   value8 TLong = 5
 
-instance Bytecode TLong where
+instance Component TLong where
   parser = TLong <$ word8 (value8 TLong)
   encode t = BB.word8 $ value8 t
 
@@ -231,7 +231,7 @@ instance Show TDouble where
 instance Word8Constant TDouble where
   value8 TDouble = 6
 
-instance Bytecode TDouble where
+instance Component TDouble where
   parser = TDouble <$ word8 (value8 TDouble)
   encode t = BB.word8 $ value8 t
 
@@ -244,7 +244,7 @@ instance Show TNameAndType where
 instance Word8Constant TNameAndType where
   value8 TNameAndType = 12
 
-instance Bytecode TNameAndType where
+instance Component TNameAndType where
   parser = TNameAndType <$ word8 (value8 TNameAndType)
   encode t = BB.word8 $ value8 t
 
@@ -257,7 +257,7 @@ instance Show TUtf8 where
 instance Word8Constant TUtf8 where
   value8 TUtf8 = 1
 
-instance Bytecode TUtf8 where
+instance Component TUtf8 where
   parser = TUtf8 <$ word8 (value8 TUtf8)
   encode t = BB.word8 $ value8 t
 
@@ -270,7 +270,7 @@ instance Show TMethodHandle where
 instance Word8Constant TMethodHandle where
   value8 TMethodHandle = 15
 
-instance Bytecode TMethodHandle where
+instance Component TMethodHandle where
   parser = TMethodHandle <$ word8 (value8 TMethodHandle)
   encode t = BB.word8 $ value8 t
 
@@ -283,7 +283,7 @@ instance Show TMethodType where
 instance Word8Constant TMethodType where
   value8 TMethodType = 16
 
-instance Bytecode TMethodType where
+instance Component TMethodType where
   parser = TMethodType <$ word8 (value8 TMethodType)
   encode t = BB.word8 $ value8 t
 
@@ -296,7 +296,7 @@ instance Show TDynamic where
 instance Word8Constant TDynamic where
   value8 TDynamic = 17
 
-instance Bytecode TDynamic where
+instance Component TDynamic where
   parser = TDynamic <$ word8 (value8 TDynamic)
   encode t = BB.word8 $ value8 t
 
@@ -309,7 +309,7 @@ instance Show TInvokeDynamic where
 instance Word8Constant TInvokeDynamic where
   value8 TInvokeDynamic = 18
 
-instance Bytecode TInvokeDynamic where
+instance Component TInvokeDynamic where
   parser = TInvokeDynamic <$ word8 (value8 TInvokeDynamic)
   encode t = BB.word8 $ value8 t
 
@@ -322,7 +322,7 @@ instance Show TModule where
 instance Word8Constant TModule where
   value8 TModule = 19
 
-instance Bytecode TModule where
+instance Component TModule where
   parser = TModule <$ word8 (value8 TModule)
   encode t = BB.word8 $ value8 t
 
@@ -335,7 +335,7 @@ instance Show TPackage where
 instance Word8Constant TPackage where
   value8 TPackage = 20
 
-instance Bytecode TPackage where
+instance Component TPackage where
   parser = TPackage <$ word8 (value8 TPackage)
   encode t = BB.word8 $ value8 t
 
@@ -390,7 +390,7 @@ data ConstantPoolEntry
     Package TPackage Utf8Ref
   deriving (Show)
 
-instance Bytecode ConstantPoolEntry where
+instance Component ConstantPoolEntry where
   parser =
     choice
       [ parserClass,
@@ -489,7 +489,7 @@ instance Word8Constant MethodRefKind where
   value8 NewInvokeSpecial = 8
   value8 InvokeInterface = 9
 
-instance Bytecode MethodRefKind where
+instance Component MethodRefKind where
   parser =
     choice
       [ parserGetField,
@@ -525,7 +525,7 @@ newtype ClassRef = ClassRef Word16
 instance Show ClassRef where
   show (ClassRef n) = "#" ++ show n
 
-instance Bytecode ClassRef where
+instance Component ClassRef where
   parser = ClassRef <$> anyWord16
   encode (ClassRef c) = word16BE c
 
@@ -535,7 +535,7 @@ newtype NameAndTypeRef = NameAndTypeRef Word16
 instance Show NameAndTypeRef where
   show (NameAndTypeRef n) = "#" ++ show n
 
-instance Bytecode NameAndTypeRef where
+instance Component NameAndTypeRef where
   parser = NameAndTypeRef <$> anyWord16
   encode (NameAndTypeRef n) = word16BE n
 
@@ -545,7 +545,7 @@ newtype Utf8Ref = Utf8Ref Word16
 instance Show Utf8Ref where
   show (Utf8Ref n) = "#" ++ show n
 
-instance Bytecode Utf8Ref where
+instance Component Utf8Ref where
   parser = Utf8Ref <$> anyWord16
   encode (Utf8Ref u) = word16BE u
 
@@ -555,7 +555,7 @@ newtype ConstantPoolRef = ConstantPoolRef Word16
 instance Show ConstantPoolRef where
   show (ConstantPoolRef n) = "#" ++ show n
 
-instance Bytecode ConstantPoolRef where
+instance Component ConstantPoolRef where
   parser = ConstantPoolRef <$> anyWord16
   encode (ConstantPoolRef c) = word16BE c
 

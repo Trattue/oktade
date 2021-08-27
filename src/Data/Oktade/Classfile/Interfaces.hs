@@ -11,9 +11,9 @@ where
 
 import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
+import Data.Oktade.ByteParser (anyWord16)
 import Data.Oktade.Classfile.ConstantPool (ClassRef)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
-import Data.Oktade.Internal.Parser (anyWord16)
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Interfaces
@@ -31,7 +31,7 @@ instance Show Interfaces where
   show (Interfaces cs) =
     "Interfaces:\n" ++ init (unlines $ ("  " ++) . show <$> cs)
 
-instance Bytecode Interfaces where
+instance Component Interfaces where
   parser =
     Interfaces <$> do
       interfaceCount <- anyWord16

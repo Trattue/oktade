@@ -1,8 +1,20 @@
 # oktade
 
-Parser for JVM classfiles
+Parser for JVM classfiles, built apon the parser combinator library
+[attoparsec](https://hackage.haskell.org/package/attoparsec).
 
 This software is still in early development and not ready fo serious usage yet.
+
+Oktade is able to parse entire classfiles correctly, however some things still
+need to be done:
+* Argument parsing (including the bytecode parsing). Currently, all arguments
+  are represented as bvytestrings in their most general form possible.
+* Signature string parsing. Currently, signatures are stored as bytestrings.
+* MUTF-8 decoding and encoding.
+* Write tests.
+* Implement operations modifying the classfile/bytecode.
+* Profile and improve performace, if necessary.
+* Learn more Haskell and improve code quality.
 
 ## License
 

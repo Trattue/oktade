@@ -28,7 +28,7 @@ import Data.Oktade.Classfile.Methods (Methods)
 import Data.Oktade.Classfile.SuperClass (SuperClass)
 import Data.Oktade.Classfile.ThisClass (ThisClass)
 import Data.Oktade.Classfile.Version (Version)
-import Data.Oktade.Internal.Bytecode (Bytecode (..))
+import Data.Oktade.Component (Component (..))
 
 --------------------------------------------------------------------------------
 -- Parsing and Encoding
@@ -121,7 +121,7 @@ instance Show Classfile where
           ]
      in intercalate "\n" components
 
-instance Bytecode Classfile where
+instance Component Classfile where
   parser =
     Classfile
       <$> parser
