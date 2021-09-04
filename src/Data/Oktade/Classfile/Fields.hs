@@ -32,7 +32,8 @@ instance Show Fields where
   show (Fields []) = "Fields: -"
   show (Fields fs) =
     "Fields:\n"
-      ++ init (unlines $ (init . unlines . (("  " ++) <$>) . lines) . show <$> fs)
+      ++ init
+        (unlines $ (init . unlines . (("  " ++) <$>) . lines) . show <$> fs)
 
 instance Component Fields where
   parser =

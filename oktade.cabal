@@ -1,78 +1,70 @@
-cabal-version: 3.0
-
--- Package metadata
+cabal-version: 3.4
 name:          oktade
 version:       0.1.0
-author:        Trattue
-synopsis:      Parser for JVM classfiles
 license:       Apache-2.0
 license-file:  LICENSE
+copyright:     (c) 2021 Trattue
+author:        Trattue
+synopsis:      Parser for JVM classfiles
 
 library
-  default-language: Haskell2010
-  hs-source-dirs:   src
-  build-depends:
-    , attoparsec  ^>=0.14.1
-    , base        ^>=4.14.2.0
-    , bytestring  ^>=0.11.1.0
-    , containers  ^>=0.6.5.1
+    exposed-modules:
+        Data.Oktade.ByteConstant
+        Data.Oktade.ByteParser
+        Data.Oktade.Classfile
+        Data.Oktade.Classfile.AccessFlags
+        Data.Oktade.Classfile.Attributes
+        Data.Oktade.Classfile.ConstantPool
+        Data.Oktade.Classfile.Fields
+        Data.Oktade.Classfile.Fields.AccessFlags
+        Data.Oktade.Classfile.Interfaces
+        Data.Oktade.Classfile.MagicNumber
+        Data.Oktade.Classfile.Methods
+        Data.Oktade.Classfile.Methods.AccessFlags
+        Data.Oktade.Classfile.SuperClass
+        Data.Oktade.Classfile.ThisClass
+        Data.Oktade.Classfile.Version
+        Data.Oktade.Component
 
-  -- LANGUAGE extensions used by modules in this package.
-  other-extensions:
-
-  -- Modules exported by the library.
-  exposed-modules:
-    Data.Oktade.ByteConstant
-    Data.Oktade.ByteParser
-    Data.Oktade.Classfile
-    Data.Oktade.Classfile.AccessFlags
-    Data.Oktade.Classfile.Attributes
-    Data.Oktade.Classfile.ConstantPool
-    Data.Oktade.Classfile.Fields
-    Data.Oktade.Classfile.Fields.AccessFlags
-    Data.Oktade.Classfile.Interfaces
-    Data.Oktade.Classfile.MagicNumber
-    Data.Oktade.Classfile.Methods
-    Data.Oktade.Classfile.Methods.AccessFlags
-    Data.Oktade.Classfile.SuperClass
-    Data.Oktade.Classfile.ThisClass
-    Data.Oktade.Classfile.Version
-    Data.Oktade.Component
-
-  -- Modules included in this library but not exported.
-  other-modules:
+    hs-source-dirs:   src
+    default-language: Haskell2010
+    build-depends:
+        attoparsec >=0.14.1 && <0.15,
+        base >=4.15.0 && <4.16,
+        bytestring >=0.11.1 && <0.12,
+        containers >=0.6.4 && <0.7
 
 executable oktade
-  default-language: Haskell2010
-  hs-source-dirs:   app
-  main-is:          Main.hs
-  build-depends:
-    , attoparsec  ^>=0.14.1
-    , base        ^>=4.14.2.0
-    , bytestring  ^>=0.11.1.0
-    , directory   ^>=1.3.6.2
-    , filepath    ^>=1.4.2.1
-    , oktade
+    main-is:          Main.hs
+    hs-source-dirs:   app
+    default-language: Haskell2010
+    build-depends:
+        attoparsec >=0.14.1 && <0.15,
+        base >=4.15.0 && <4.16,
+        bytestring >=0.11.1 && <0.12,
+        directory >=1.3.6 && <1.4,
+        filepath >=1.4.2 && <1.5,
+        oktade
 
 test-suite oktade-test
-  default-language: Haskell2010
-  hs-source-dirs:   testsuite/tests
-  test-module:      OktadeTest
-  type:             detailed-0.9
-  build-depends:
-    , base   ^>=4.14.2.0
-    , Cabal  ^>=3.6.0.0
+    type:             detailed-0.9
+    test-module:      OktadeTest
+    hs-source-dirs:   testsuite/tests
+    default-language: Haskell2010
+    build-depends:
+        base >=4.15.0 && <4.16,
+        Cabal
 
 benchmark oktade-bench
-  default-language: Haskell2010
-  hs-source-dirs:   testsuite/benchmarks
-  main-is:          Main.hs
-  type:             exitcode-stdio-1.0
-  build-depends:
-    , attoparsec  ^>=0.14.1
-    , base        ^>=4.14.2.0
-    , bytestring  ^>=0.11.1.0
-    , clock       ^>=0.8.2
-    , directory   ^>=1.3.6.2
-    , filepath    ^>=1.4.2.1
-    , oktade
+    type:             exitcode-stdio-1.0
+    main-is:          Main.hs
+    hs-source-dirs:   testsuite/benchmarks
+    default-language: Haskell2010
+    build-depends:
+        attoparsec >=0.14.1 && <0.15,
+        base >=4.15.0 && <4.16,
+        bytestring >=0.11.1 && <0.12,
+        clock,
+        directory >=1.3.6 && <1.4,
+        filepath >=1.4.2 && <1.5,
+        oktade
