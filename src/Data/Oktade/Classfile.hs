@@ -39,13 +39,13 @@ import Data.Oktade.Component (Component (..))
 -- Behind the scenes, oktade uses the attoparsec parser combinator library for
 -- parsing classfiles. Oktade, however, hides most implementation details of the
 -- actual parsing and encoding for the library user. This section defines a top
--- level interface for using oktade's parsers and encoders.
+-- level interface for using oktades parsers and encoders.
 --
 -- Oktade is able to translate a given 'ByteString', defined by the bytestring
 -- library, to a data structure representing a classfile ('Classfile') and
 -- encode this data structure back to a 'ByteString'. Both parsing and encoding
 -- happen in a lazy manner. To indicate parser failure, oktade simply uses
--- attoparsec's 'Result' type.
+-- attoparsecs 'Result' type.
 --
 -- Example usage for reading a classfile and printing its parsed content:
 --

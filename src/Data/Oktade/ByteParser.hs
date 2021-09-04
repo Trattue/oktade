@@ -19,7 +19,7 @@ import Data.Word (Word16, Word32, Word64)
 -- Parsers
 --------------------------------------------------------------------------------
 
--- | General 'WordN' 'Parser'. Takes as arguments the amaount of bits the
+-- | General 'WordN' 'Parser'. Takes as arguments the amount of bits the
 -- word will have and a 'Parser' for the word with n / s bits.
 anyWordN :: (Integral a, Bits b, Num b) => Int -> Parser a -> Parser b
 anyWordN n anyWordHalfN = toWord n <$> anyWordHalfN <*> anyWordHalfN

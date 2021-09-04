@@ -5,7 +5,7 @@
 -- Type definitions for the classfile constant pool and its entries.
 module Data.Oktade.Classfile.ConstantPool
   ( -- * Constant Pool
-    -- $contant-pool
+    -- $constant-pool
     ConstantPool (..),
 
     -- ** Constant Pool Tags
@@ -57,7 +57,7 @@ import Text.Printf (printf)
 -- Constant Pool
 --------------------------------------------------------------------------------
 
--- $contant-pool
+-- $constant-pool
 -- The constant pool is arguably one of the larger structures in the classfile,
 -- as such the corresponding data structures may seem a bit overwhelming at
 -- first.
@@ -67,7 +67,7 @@ import Text.Printf (printf)
 --
 -- Each entry has a specific tag which allows parsers to determine which kind of
 -- entry it should parse. These constants are described in the
--- __Contant Pool Tags__ section.
+-- __Constant Pool Tags__ section.
 --
 -- The actual constant pool entries are represented as 'ConstantPoolEntry's.
 
