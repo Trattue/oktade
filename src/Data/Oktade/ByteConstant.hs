@@ -38,7 +38,7 @@ class Word16Constant a where
 -- 'Word8Constant' and 'Word16Constant' should be preferred, if the constant
 -- represents one or two bytes.
 --
--- Note: Classfiles are stored in Big Endian.
+-- Note: Classfiles are encoded in Big Endian.
 class ByteStringConstant a where
   -- | The value as 'Word8' list.
   rawValue :: a -> [Word8]
