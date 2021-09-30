@@ -1,6 +1,6 @@
 -- |
--- Module      : Data.Oktade.ByteParser
--- License     : Apache-2.0
+-- Module: Data.Oktade.ByteParser
+-- License: Apache-2.0
 --
 -- Auxiliary parsers for parsing 16, 32 and 64 bit words.
 module Data.Oktade.ByteParser
@@ -8,6 +8,9 @@ module Data.Oktade.ByteParser
     anyWord16,
     anyWord32,
     anyWord64,
+    satisfy16,
+    satisfy32,
+    satisfy64,
     word16,
     word32,
     word64,
@@ -17,7 +20,7 @@ where
 import Data.Attoparsec.ByteString.Lazy (Parser, anyWord8)
 import Data.Bits (Bits, shiftL)
 import Data.Word (Word16, Word32, Word64)
-import GHC.Word (Word32)
+import Debug.Trace (trace, traceId)
 
 --------------------------------------------------------------------------------
 -- Parsers
@@ -51,7 +54,7 @@ anyWord64 :: Parser Word64
 anyWord64 = anyWordN 64 anyWord32
 
 -- | Match any value supplied by the 'Parser' fullfilling the predicate @p@.
-satisfyN :: Parser b -> (b -> Bool) -> Parser b
+satisfyN :: Show b => Parser b -> (b -> Bool) -> Parser b
 satisfyN f p = do
   w <- f
   if p w

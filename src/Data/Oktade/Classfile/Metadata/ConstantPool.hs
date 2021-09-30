@@ -1,9 +1,9 @@
 -- |
--- Module      : Data.Oktade.Classfile.ConstantPool
--- License     : Apache-2.0
+-- Module: Data.Oktade.Classfile.Metadata.Classfile
+-- License: Apache-2.0
 --
--- Type definitions for the classfile constant pool and its entries.
-module Data.Oktade.Classfile.ConstantPool
+-- Types and functions for parsing and unparsing the classfile constant pool.
+module Data.Oktade.Classfile.Metadata.ConstantPool
   ( -- * Constant Pool
     -- $constant-pool
     ConstantPool (..),
@@ -40,18 +40,17 @@ module Data.Oktade.Classfile.ConstantPool
   )
 where
 
-import Data.Attoparsec.ByteString (choice, word8)
-import qualified Data.Attoparsec.ByteString as A (take)
+import Data.Attoparsec.ByteString.Lazy (choice, word8)
+import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as B (length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE, word64BE)
 import qualified Data.ByteString.Builder as BB (word8)
-import Data.IntMap (IntMap, fromAscList, size, toAscList)
+import Data.IntMap (IntMap, fromAscList)
 import Data.Oktade.ByteConstant (Word8Constant (..))
 import Data.Oktade.ByteParser (anyWord16, anyWord32, anyWord64)
-import Data.Oktade.Component (Component (..))
-import Data.Word (Word16, Word32, Word64, Word8)
-import Text.Printf (printf)
+import Data.Oktade.Parse (Parse (..), Unparse (..))
+import Data.Word (Word16, Word32, Word64)
 
 --------------------------------------------------------------------------------
 -- Constant Pool
@@ -66,7 +65,7 @@ import Text.Printf (printf)
 -- (here: 'ConstantPool').
 --
 -- Each entry has a specific tag which allows parsers to determine which kind of
--- entry it should parse. These constants are described in the
+-- entry it should parser. These constants are described in the
 -- __Constant Pool Tags__ section.
 --
 -- The actual constant pool entries are represented as 'ConstantPoolEntry's.
@@ -74,24 +73,12 @@ import Text.Printf (printf)
 -- | Represents the classfile constant pool which is a list of
 -- 'ConstantPoolEntry's mapped to their indices.
 --
--- More about the constant pool can be learned in the JVM spec:
+-- More about the constant pool can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
 newtype ConstantPool = ConstantPool (IntMap ConstantPoolEntry)
+  deriving (Show)
 
-instance Show ConstantPool where
-  show (ConstantPool m)
-    | null m = "Constant Pool: -"
-    | otherwise =
-      let l = size m
-          -- Number of digits of the largest constant pool entry index.
-          d = 1 + ceiling (logBase 10 (fromIntegral l))
-       in init $ "Constant Pool:\n" ++ unlines (showEntry l d <$> toAscList m)
-    where
-      -- Right aligned formatting considering the maximum number of digits.
-      showEntry l d (k, v) =
-        printf ("  %" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ show v
-
-instance Component ConstantPool where
+instance Parse ConstantPool where
   parser = do
     entryCountPlusOne <- anyWord16
     -- Yes, this is correct. For some reason, the classfile stores the constant
@@ -107,12 +94,14 @@ instance Component ConstantPool where
         | otherwise = do
           x <- p
           countC c (n + constantPoolSize x) p ((n, x) : acc)
-  encode (ConstantPool m) =
-    word16BE (fromIntegral (sizeC m + 1)) <> foldr ((<>) . encode) mempty m
+
+instance Unparse ConstantPool where
+  unparser (ConstantPool m) =
+    word16BE (fromIntegral (sizeC m + 1)) <> foldr ((<>) . unparser) mempty m
     where
       -- Custom 'size' function for considering the 'constantPoolSize' of
       -- entries.
-      sizeC m = foldr ((+) . constantPoolSize) 0 m
+      sizeC = foldr ((+) . constantPoolSize) 0
 
 --------------------------------------------------------------------------------
 -- Constant Pool Tags
@@ -120,224 +109,224 @@ instance Component ConstantPool where
 
 -- | Tag for the 'Class' constant pool entry.
 data TClass = TClass
-
-instance Show TClass where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TClass where
   value8 TClass = 7
 
-instance Component TClass where
+instance Parse TClass where
   parser = TClass <$ word8 (value8 TClass)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TClass where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'FieldRef' constant pool entry.
 data TFieldRef = TFieldRef
-
-instance Show TFieldRef where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TFieldRef where
   value8 TFieldRef = 9
 
-instance Component TFieldRef where
+instance Parse TFieldRef where
   parser = TFieldRef <$ word8 (value8 TFieldRef)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TFieldRef where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'MethodRef' constant pool entry.
 data TMethodRef = TMethodRef
-
-instance Show TMethodRef where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TMethodRef where
   value8 TMethodRef = 10
 
-instance Component TMethodRef where
+instance Parse TMethodRef where
   parser = TMethodRef <$ word8 (value8 TMethodRef)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TMethodRef where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'InterfaceMethodRef' constant pool entry.
 data TInterfaceMethodRef = TInterfaceMethodRef
-
-instance Show TInterfaceMethodRef where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TInterfaceMethodRef where
   value8 TInterfaceMethodRef = 11
 
-instance Component TInterfaceMethodRef where
+instance Parse TInterfaceMethodRef where
   parser = TInterfaceMethodRef <$ word8 (value8 TInterfaceMethodRef)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TInterfaceMethodRef where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'String' constant pool entry.
 data TString = TString
-
-instance Show TString where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TString where
   value8 TString = 8
 
-instance Component TString where
+instance Parse TString where
   parser = TString <$ word8 (value8 TString)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TString where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Integer' constant pool entry.
 data TInteger = TInteger
-
-instance Show TInteger where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TInteger where
   value8 TInteger = 3
 
-instance Component TInteger where
+instance Parse TInteger where
   parser = TInteger <$ word8 (value8 TInteger)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TInteger where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Float' constant pool entry.
 data TFloat = TFloat
-
-instance Show TFloat where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TFloat where
   value8 TFloat = 4
 
-instance Component TFloat where
+instance Parse TFloat where
   parser = TFloat <$ word8 (value8 TFloat)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TFloat where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Long' constant pool entry.
 data TLong = TLong
-
-instance Show TLong where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TLong where
   value8 TLong = 5
 
-instance Component TLong where
+instance Parse TLong where
   parser = TLong <$ word8 (value8 TLong)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TLong where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Double' constant pool entry.
 data TDouble = TDouble
-
-instance Show TDouble where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TDouble where
   value8 TDouble = 6
 
-instance Component TDouble where
+instance Parse TDouble where
   parser = TDouble <$ word8 (value8 TDouble)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TDouble where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'NameAndType' constant pool entry.
 data TNameAndType = TNameAndType
-
-instance Show TNameAndType where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TNameAndType where
   value8 TNameAndType = 12
 
-instance Component TNameAndType where
+instance Parse TNameAndType where
   parser = TNameAndType <$ word8 (value8 TNameAndType)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TNameAndType where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Utf8' constant pool entry.
 data TUtf8 = TUtf8
-
-instance Show TUtf8 where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TUtf8 where
   value8 TUtf8 = 1
 
-instance Component TUtf8 where
+instance Parse TUtf8 where
   parser = TUtf8 <$ word8 (value8 TUtf8)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TUtf8 where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'MethodHandle' constant pool entry.
 data TMethodHandle = TMethodHandle
-
-instance Show TMethodHandle where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TMethodHandle where
   value8 TMethodHandle = 15
 
-instance Component TMethodHandle where
+instance Parse TMethodHandle where
   parser = TMethodHandle <$ word8 (value8 TMethodHandle)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TMethodHandle where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'MethodType' constant pool entry.
 data TMethodType = TMethodType
-
-instance Show TMethodType where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TMethodType where
   value8 TMethodType = 16
 
-instance Component TMethodType where
+instance Parse TMethodType where
   parser = TMethodType <$ word8 (value8 TMethodType)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TMethodType where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Dynamic' constant pool entry.
 data TDynamic = TDynamic
-
-instance Show TDynamic where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TDynamic where
   value8 TDynamic = 17
 
-instance Component TDynamic where
+instance Parse TDynamic where
   parser = TDynamic <$ word8 (value8 TDynamic)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TDynamic where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'InvokeDynamic' constant pool entry.
 data TInvokeDynamic = TInvokeDynamic
-
-instance Show TInvokeDynamic where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TInvokeDynamic where
   value8 TInvokeDynamic = 18
 
-instance Component TInvokeDynamic where
+instance Parse TInvokeDynamic where
   parser = TInvokeDynamic <$ word8 (value8 TInvokeDynamic)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TInvokeDynamic where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Module' constant pool entry.
 data TModule = TModule
-
-instance Show TModule where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TModule where
   value8 TModule = 19
 
-instance Component TModule where
+instance Parse TModule where
   parser = TModule <$ word8 (value8 TModule)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TModule where
+  unparser = BB.word8 . value8
 
 -- | Tag for the 'Package' constant pool entry.
 data TPackage = TPackage
-
-instance Show TPackage where
-  show t = "(" ++ show (value8 t) ++ ")"
+  deriving (Show)
 
 instance Word8Constant TPackage where
   value8 TPackage = 20
 
-instance Component TPackage where
+instance Parse TPackage where
   parser = TPackage <$ word8 (value8 TPackage)
-  encode t = BB.word8 $ value8 t
+
+instance Unparse TPackage where
+  unparser = BB.word8 . value8
 
 --------------------------------------------------------------------------------
 -- Constant Pool Entries
@@ -347,70 +336,127 @@ instance Component TPackage where
 data ConstantPoolEntry
   = -- | Class or an interface. Contains a reference to an 'Utf8'
     -- constant encoding the class/interface name.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.1
     Class TClass Utf8Ref
   | -- | Represents a field. References the 'Class' it belongs to and a
     -- 'NameAndType' constant containing the field information.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
     FieldRef TFieldRef ClassRef NameAndTypeRef
   | -- | Represents a method. References the 'Class' it belongs to and a
     -- 'NameAndType' constant containing the method information.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
     MethodRef TMethodRef ClassRef NameAndTypeRef
   | -- | Represents an interface method. References the 'Class' it belongs to
     -- and a 'NameAndType' constant containing the interface method information.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
     InterfaceMethodRef TInterfaceMethodRef ClassRef NameAndTypeRef
   | -- | Constant String object. Contains a reference to its 'Utf8'
     -- content.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.3
     String TString Utf8Ref
   | -- | 32 bit integer constant (int).
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.4
     Integer TInteger Word32
   | -- | 32 bit floating point number constant (float).
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.4
     Float TFloat Word32
   | -- | 64 bit integer constant (long).
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.5
     Long TLong Word64
   | -- | 64 bit floating point number constant (double).
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.5
     Double TDouble Word64
   | -- | Represents a field/method without information about the class it
     -- belongs to. References the 'Utf8' field/method name and the 'Utf8'
     -- field/method descriptor.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.6
     NameAndType TNameAndType Utf8Ref Utf8Ref
   | -- | String encoded with Modified UTF-8.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.7
     Utf8 TUtf8 ByteString
   | -- | Method handle containing the reference kind and a reference to a
     -- 'ConstantPoolEntry' depending on the reference kind.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.8
     MethodHandle TMethodHandle MethodRefKind ConstantPoolRef
-  | -- | TODO
+  | -- | Represents a method type. The 'Utf8Ref' points to the method
+    -- descriptor.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.9
     MethodType TMethodType Utf8Ref
-  | -- | TODO
+  | -- | Represents a dynamically computed constant, determined when invoking a
+    -- corresponding bootstrap method, for example when @ldc@ is called.
+    -- Contains a reference to the constant's type.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.10
     Dynamic TDynamic BootstrapMethodAttrRef NameAndTypeRef
-  | -- | TODO
+  | -- | Represents a dynamically computed call site, determined when invoking a
+    -- corresponding bootstrap method, in this case when @invokedynamic@ is
+    -- called. Contains a reference to the call site's type.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.10
     InvokeDynamic TInvokeDynamic BootstrapMethodAttrRef NameAndTypeRef
   | -- | Represents a module. References its 'Utf8' name.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.11
     Module TModule Utf8Ref
   | -- | Represents a package exported or opened by a module. References its
     -- 'Utf8' name.
+    --
+    -- Read the JVM specification for more information:
+    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.12
     Package TPackage Utf8Ref
   deriving (Show)
 
-instance Component ConstantPoolEntry where
+instance Parse ConstantPoolEntry where
   parser =
-    choice
-      [ parserClass,
-        parserFieldRef,
-        parserMethodRef,
-        parserInterfaceMethodRef,
-        parserString,
-        parserInteger,
-        parserFloat,
-        parserLong,
-        parserDouble,
-        parserNameAndType,
-        parserUtf8,
-        parserMethodHandle,
-        parserMethodType,
-        parserDynamic,
-        parserInvokeDynamic,
-        parserModule,
-        parserPackage
-      ]
+    let parsers =
+          [ parserClass,
+            parserFieldRef,
+            parserMethodRef,
+            parserInterfaceMethodRef,
+            parserString,
+            parserInteger,
+            parserFloat,
+            parserLong,
+            parserDouble,
+            parserNameAndType,
+            parserUtf8,
+            parserMethodHandle,
+            parserMethodType,
+            parserDynamic,
+            parserInvokeDynamic,
+            parserModule,
+            parserPackage
+          ]
+     in choice parsers
     where
       parserClass = Class <$> parser <*> parser
       parserFieldRef = FieldRef <$> parser <*> parser <*> parser
@@ -433,26 +479,26 @@ instance Component ConstantPoolEntry where
       parserInvokeDynamic = InvokeDynamic <$> parser <*> anyWord16 <*> parser
       parserModule = Module <$> parser <*> parser
       parserPackage = Package <$> parser <*> parser
-  encode (Class t u) = encode t <> encode u
-  encode (FieldRef t c n) = encode t <> encode c <> encode n
-  encode (MethodRef t c n) = encode t <> encode c <> encode n
-  encode (InterfaceMethodRef t c n) = encode t <> encode c <> encode n
-  encode (String t u) = encode t <> encode u
-  encode (Integer t w) = encode t <> word32BE w
-  encode (Float t w) = encode t <> word32BE w
-  encode (Long t w) = encode t <> word64BE w
-  encode (Double t w) = encode t <> word64BE w
-  encode (NameAndType t u u') = encode t <> encode u <> encode u'
-  encode (Utf8 t b) =
-    encode t
-      <> word16BE (fromIntegral (B.length b))
-      <> byteString b
-  encode (MethodHandle t m c) = encode t <> encode m <> encode c
-  encode (MethodType t u) = encode t <> encode u
-  encode (Dynamic t b n) = encode t <> word16BE b <> encode n
-  encode (InvokeDynamic t b n) = encode t <> word16BE b <> encode n
-  encode (Module t u) = encode t <> encode u
-  encode (Package t u) = encode t <> encode u
+
+instance Unparse ConstantPoolEntry where
+  unparser (Class t u) = unparser t <> unparser u
+  unparser (FieldRef t c n) = unparser t <> unparser c <> unparser n
+  unparser (MethodRef t c n) = unparser t <> unparser c <> unparser n
+  unparser (InterfaceMethodRef t c n) = unparser t <> unparser c <> unparser n
+  unparser (String t u) = unparser t <> unparser u
+  unparser (Integer t w) = unparser t <> word32BE w
+  unparser (Float t w) = unparser t <> word32BE w
+  unparser (Long t w) = unparser t <> word64BE w
+  unparser (Double t w) = unparser t <> word64BE w
+  unparser (NameAndType t u u') = unparser t <> unparser u <> unparser u'
+  unparser (Utf8 t b) =
+    unparser t <> word16BE (fromIntegral (B.length b)) <> byteString b
+  unparser (MethodHandle t m c) = unparser t <> unparser m <> unparser c
+  unparser (MethodType t u) = unparser t <> unparser u
+  unparser (Dynamic t b n) = unparser t <> word16BE b <> unparser n
+  unparser (InvokeDynamic t b n) = unparser t <> word16BE b <> unparser n
+  unparser (Module t u) = unparser t <> unparser u
+  unparser (Package t u) = unparser t <> unparser u
 
 -- | Determines the constant pool size of entries. Bytecode has the questionable
 -- feature that 'Double' and 'Long' entries take up two constant pool entry
@@ -464,7 +510,7 @@ constantPoolSize _ = 1
 
 -- | Types of method references used by 'MethodHandle's.
 --
--- Read the JVM spec for more information:
+-- Read the JVM specification for more information:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-5.html#jvms-5.4.3.5
 data MethodRefKind
   = GetField
@@ -489,19 +535,20 @@ instance Word8Constant MethodRefKind where
   value8 NewInvokeSpecial = 8
   value8 InvokeInterface = 9
 
-instance Component MethodRefKind where
+instance Parse MethodRefKind where
   parser =
-    choice
-      [ parserGetField,
-        parserGetStatic,
-        parserPutField,
-        parserPutStatic,
-        parserInvokeVirtual,
-        parserInvokeStatic,
-        parserInvokeSpecial,
-        parserNewInvokeSpecial,
-        parserInvokeInterface
-      ]
+    let parsers =
+          [ parserGetField,
+            parserGetStatic,
+            parserPutField,
+            parserPutStatic,
+            parserInvokeVirtual,
+            parserInvokeStatic,
+            parserInvokeSpecial,
+            parserNewInvokeSpecial,
+            parserInvokeInterface
+          ]
+     in choice parsers
     where
       parserGetField = GetField <$ word8 (value8 GetField)
       parserGetStatic = GetStatic <$ word8 (value8 GetStatic)
@@ -513,7 +560,9 @@ instance Component MethodRefKind where
       parserNewInvokeSpecial =
         NewInvokeSpecial <$ word8 (value8 NewInvokeSpecial)
       parserInvokeInterface = InvokeInterface <$ word8 (value8 InvokeInterface)
-  encode m = BB.word8 $ value8 m
+
+instance Unparse MethodRefKind where
+  unparser = BB.word8 . value8
 
 --------------------------------------------------------------------------------
 -- References
@@ -521,43 +570,43 @@ instance Component MethodRefKind where
 
 -- | Reference to a 'Class' constant.
 newtype ClassRef = ClassRef Word16
+  deriving (Show)
 
-instance Show ClassRef where
-  show (ClassRef n) = "#" ++ show n
-
-instance Component ClassRef where
+instance Parse ClassRef where
   parser = ClassRef <$> anyWord16
-  encode (ClassRef c) = word16BE c
+
+instance Unparse ClassRef where
+  unparser (ClassRef c) = word16BE c
 
 -- | Reference to a 'NameAndType' constant.
 newtype NameAndTypeRef = NameAndTypeRef Word16
+  deriving (Show)
 
-instance Show NameAndTypeRef where
-  show (NameAndTypeRef n) = "#" ++ show n
-
-instance Component NameAndTypeRef where
+instance Parse NameAndTypeRef where
   parser = NameAndTypeRef <$> anyWord16
-  encode (NameAndTypeRef n) = word16BE n
+
+instance Unparse NameAndTypeRef where
+  unparser (NameAndTypeRef n) = word16BE n
 
 -- | Reference to an 'Utf8' constant.
 newtype Utf8Ref = Utf8Ref Word16
+  deriving (Show)
 
-instance Show Utf8Ref where
-  show (Utf8Ref n) = "#" ++ show n
-
-instance Component Utf8Ref where
+instance Parse Utf8Ref where
   parser = Utf8Ref <$> anyWord16
-  encode (Utf8Ref u) = word16BE u
+
+instance Unparse Utf8Ref where
+  unparser (Utf8Ref u) = word16BE u
 
 -- | General reference to a 'ConstantPoolEntry'.
 newtype ConstantPoolRef = ConstantPoolRef Word16
+  deriving (Show)
 
-instance Show ConstantPoolRef where
-  show (ConstantPoolRef n) = "#" ++ show n
-
-instance Component ConstantPoolRef where
+instance Parse ConstantPoolRef where
   parser = ConstantPoolRef <$> anyWord16
-  encode (ConstantPoolRef c) = word16BE c
+
+instance Unparse ConstantPoolRef where
+  unparser (ConstantPoolRef c) = word16BE c
 
 -- | Reference to a BootstrapMethod attribute.
 type BootstrapMethodAttrRef = Word16 -- TODO: where does this belong to?

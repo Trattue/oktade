@@ -1,35 +1,32 @@
 -- |
--- Module      : Data.Oktade.Classfile.AccessFlags
--- License     : Apache-2.0
+-- Module: Data.Oktade.Classfile.Class.AccessFlags
+-- License: Apache-2.0
 --
--- Type definitions for the classfile access flags.
-module Data.Oktade.Classfile.AccessFlags
+-- Types and functions for parsing and unparsing the classfile class access
+-- flags.
+module Data.Oktade.Classfile.Class.AccessFlags
   ( -- * Access Flags
     AccessFlags (..),
     AccessFlag (..),
   )
 where
 
-import Data.Bits (Bits ((.&.), (.|.)))
+import Data.Bits ((.&.), (.|.))
 import Data.ByteString.Builder (word16BE)
-import Data.Oktade.ByteConstant (Word16Constant (..))
+import Data.Oktade.ByteConstant (Word16Constant, value16)
 import Data.Oktade.ByteParser (anyWord16)
-import Data.Oktade.Component (Component (..))
+import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 
 --------------------------------------------------------------------------------
 -- Access Flags
 --------------------------------------------------------------------------------
 
--- | Represents the list of 'AccessFlag's the classfiles class/interface has.
+-- | List of 'AccessFlag's the classfile's class/interface has.
 newtype AccessFlags = AccessFlags [AccessFlag]
+  deriving (Show)
 
-instance Show AccessFlags where
-  show (AccessFlags []) = "Access Flags: -"
-  show (AccessFlags af) =
-    "Access Flags:\n" ++ init (unlines $ ("  " ++) . show <$> af)
-
-instance Component AccessFlags where
-  parser =
+instance Parse AccessFlags where
+  parser _ =
     let flags =
           [ Public,
             Final,
@@ -48,9 +45,11 @@ instance Component AccessFlags where
       prependIfPresent m f acc
         | m .&. value16 f == value16 f = f : acc
         | otherwise = acc
-  encode (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
 
--- | Represents a single access flag.
+instance Unparse AccessFlags where
+  unparser _ (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
+
+-- | A single access flag.
 data AccessFlag
   = -- | Declared public, may be accessed from outside its package.
     Public
@@ -71,7 +70,7 @@ data AccessFlag
     Enum
   | -- | Is a module, not a class or interface.
     Module
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Word16Constant AccessFlag where
   value16 Public = 0x0001

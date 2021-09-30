@@ -1,35 +1,30 @@
 -- |
--- Module      : Data.Oktade.Classfile.Fields.AccessFlags
--- License     : Apache-2.0
+-- Module: Data.Oktade.Classfile.Class.Fields.AccessFlags
+-- License: Apache-2.0
 --
--- Type definitions for the access flags of classfile fields.
-module Data.Oktade.Classfile.Fields.AccessFlags
+-- Types and functions for parsing and unparsing the access flags of classfile
+-- fields.
+module Data.Oktade.Classfile.Class.Fields.AccessFlags
   ( -- * Access Flags
-    AccessFlags (..),
-    AccessFlag (..),
   )
 where
 
-import Data.Bits (Bits ((.|.)), (.&.))
+import Data.Bits ((.&.), (.|.))
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.ByteConstant (Word16Constant (..))
 import Data.Oktade.ByteParser (anyWord16)
-import Data.Oktade.Component (Component (..))
+import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 
 --------------------------------------------------------------------------------
 -- Access Flags
 --------------------------------------------------------------------------------
 
--- | Represents the list of 'AccessFlag's a field has.
+-- | List of 'AccessFlag's a field has.
 newtype AccessFlags = AccessFlags [AccessFlag]
+  deriving (Show)
 
-instance Show AccessFlags where
-  show (AccessFlags []) = "Access Flags: -"
-  show (AccessFlags af) =
-    "Access Flags:\n" ++ init (unlines $ ("  " ++) . show <$> af)
-
-instance Component AccessFlags where
-  parser =
+instance Parse AccessFlags where
+  parser _ =
     let flags =
           [ Public,
             Private,
@@ -48,9 +43,11 @@ instance Component AccessFlags where
       prependIfPresent m f acc
         | m .&. value16 f == value16 f = f : acc
         | otherwise = acc
-  encode (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
 
--- | Represents a single field access flag.
+instance Unparse AccessFlags where
+  unparser _ (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
+
+-- | A single field access flag.
 data AccessFlag
   = -- | Declared public, may be accessed from outside its package.
     Public

@@ -13,7 +13,7 @@ main = do
     (path : _) -> do
       classfile <- BS.readFile path
       case parseClassfile classfile of
-        Fail _ _ e ->
+        Fail i _ e ->
           putStrLn $
             "Failed parsing file " ++ show path ++ ", is it a valid classfile?"
         Done _ r -> print r

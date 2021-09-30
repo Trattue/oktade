@@ -1,13 +1,13 @@
 -- |
--- Module      : Data.Oktade.Classfile
--- License     : Apache-2.0
+-- Module: Data.Oktade.Classfile
+-- License: Apache-2.0
 --
--- Type definitions and parsers/encoders for the general classfile.
+-- Types and functions for parsing and unparsing classfiles.
 module Data.Oktade.Classfile
-  ( -- * Parsing and Encoding
-    -- $parsing_and_encoding
+  ( -- * Parsing and Unparsing
+    -- $parsing_and_unparsing
     parseClassfile,
-    encodeClassfile,
+    unparseClassfile,
 
     -- * Classfile
     Classfile (..),
@@ -15,43 +15,34 @@ module Data.Oktade.Classfile
 where
 
 import Data.Attoparsec.ByteString.Lazy (Parser, Result, parse)
-import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Builder (Builder, toLazyByteString)
 import Data.ByteString.Lazy (ByteString)
-import Data.List (intercalate)
-import Data.Oktade.Classfile.AccessFlags (AccessFlags)
-import Data.Oktade.Classfile.Attributes (Attributes)
-import Data.Oktade.Classfile.ConstantPool (ConstantPool)
-import Data.Oktade.Classfile.Fields (Fields)
-import Data.Oktade.Classfile.Interfaces (Interfaces)
-import Data.Oktade.Classfile.MagicNumber (MagicNumber)
-import Data.Oktade.Classfile.Methods (Methods)
-import Data.Oktade.Classfile.SuperClass (SuperClass)
-import Data.Oktade.Classfile.ThisClass (ThisClass)
-import Data.Oktade.Classfile.Version (Version)
-import Data.Oktade.Component (Component (..))
+import Data.Oktade.Classfile.Class (Class)
+import qualified Data.Oktade.Classfile.Class.Parse as P
+import Data.Oktade.Classfile.Metadata (Metadata)
+import Data.Oktade.Parse (Parse, Unparse, parser, unparser)
 
 --------------------------------------------------------------------------------
--- Parsing and Encoding
+-- Parsing and Unparsing
 --------------------------------------------------------------------------------
 
--- $parsing_and_encoding
+-- $parsing_and_unparsing
 --
 -- Behind the scenes, oktade uses the attoparsec parser combinator library for
--- parsing classfiles. Oktade, however, hides most implementation details of the
--- actual parsing and encoding for the library user. This section defines a top
--- level interface for using oktades parsers and encoders.
+-- parsing classfiles. This section defines a top level interface for using
+-- oktades parsers and unparsers.
 --
 -- Oktade is able to translate a given 'ByteString', defined by the bytestring
 -- library, to a data structure representing a classfile ('Classfile') and
--- encode this data structure back to a 'ByteString'. Both parsing and encoding
--- happen in a lazy manner. To indicate parser failure, oktade simply uses
--- attoparsecs 'Result' type.
+-- unparse this data structure back to a 'ByteString'. Both parsing and
+-- unparsing happen in a lazy manner. To indicate parser failure, oktade simply
+-- uses attoparsecs 'Result' type.
 --
 -- Example usage for reading a classfile and printing its parsed content:
 --
 -- >import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
 -- >import Data.ByteString.Lazy as BS (readFile)
--- >import Data.Oktade.Classfile (encodeClassfile, parseClassfile)
+-- >import Data.Oktade.Classfile (parseClassfile, unparseClassfile)
 -- >
 -- >printClassfile :: FilePath -> IO ()
 -- >printClassfile p = do
@@ -69,79 +60,40 @@ import Data.Oktade.Component (Component (..))
 -- Note that any data after the actual classfile will be ignored by the parser
 -- and returned as remaining input in the the 'Result' type.
 parseClassfile :: ByteString -> Result Classfile
-parseClassfile = parse (parser :: Parser Classfile)
+parseClassfile = parse parser
 
--- | Encodes a 'Classfile' to a lazy 'ByteString'. The resulting 'ByteString'
+-- | Unparses a 'Classfile' to a lazy 'ByteString'. The resulting 'ByteString'
 -- will exactly match the consumed input 'ByteString' (assuming the 'Classfile'
 -- wasn't modified):
 --
 -- >>> let (Done _ result) = parseClassfile classfile
--- >>> encodeClassfile result `isPrefixOf` classfile
+-- >>> unparseClassfile result `isPrefixOf` classfile
 -- True
 --
 -- Note: Classfiles are encoded in Big Endian.
-encodeClassfile :: Classfile -> ByteString
-encodeClassfile c = toLazyByteString $ encode c
+unparseClassfile :: Classfile -> ByteString
+unparseClassfile = toLazyByteString . unparser
 
 --------------------------------------------------------------------------------
 -- Classfile
 --------------------------------------------------------------------------------
 
--- | Data structure for the whole classfile. The structure of this type follows
--- closely the overall structure of the classfile format.
---
--- The structure of the classfile format can be understood reading the JVM spec:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
+-- | Top level classfile data structure. In contrary to the structure described
+-- in the JVM specification
+-- (https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1),
+-- we do have another layer of abstraction in the classfile by seperating
+-- metadata and the actual class data for easier parsing.
 data Classfile = Classfile
-  { magic :: MagicNumber,
-    version :: Version,
-    constantPool :: ConstantPool,
-    accessFlags :: AccessFlags,
-    thisClass :: ThisClass,
-    superClass :: SuperClass,
-    interfaces :: Interfaces,
-    fields :: Fields,
-    methods :: Methods,
-    attributes :: Attributes
+  { metadata :: Metadata,
+    clazz :: Class
   }
+  deriving (Show)
 
-instance Show Classfile where
-  show c =
-    let components =
-          [ show (magic c),
-            show (version c),
-            show (constantPool c),
-            show (accessFlags c),
-            show (thisClass c),
-            show (superClass c),
-            show (interfaces c),
-            show (fields c),
-            show (methods c),
-            show (attributes c)
-          ]
-     in intercalate "\n" components
+instance Parse Classfile where
+  parser = do
+    m <- parser
+    c <- P.parser m
+    return $ Classfile m c
 
-instance Component Classfile where
-  parser =
-    Classfile
-      <$> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-      <*> parser
-  encode c =
-    encode (magic c)
-      <> encode (version c)
-      <> encode (constantPool c)
-      <> encode (accessFlags c)
-      <> encode (thisClass c)
-      <> encode (superClass c)
-      <> encode (interfaces c)
-      <> encode (fields c)
-      <> encode (methods c)
-      <> encode (attributes c)
+instance Unparse Classfile where
+  unparser c = unparser (metadata c) <> undefined (metadata c) (clazz c)

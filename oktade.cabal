@@ -12,19 +12,21 @@ library
         Data.Oktade.ByteConstant
         Data.Oktade.ByteParser
         Data.Oktade.Classfile
-        Data.Oktade.Classfile.AccessFlags
-        Data.Oktade.Classfile.Attributes
-        Data.Oktade.Classfile.ConstantPool
-        Data.Oktade.Classfile.Fields
-        Data.Oktade.Classfile.Fields.AccessFlags
-        Data.Oktade.Classfile.Interfaces
-        Data.Oktade.Classfile.MagicNumber
-        Data.Oktade.Classfile.Methods
-        Data.Oktade.Classfile.Methods.AccessFlags
-        Data.Oktade.Classfile.SuperClass
-        Data.Oktade.Classfile.ThisClass
-        Data.Oktade.Classfile.Version
-        Data.Oktade.Component
+        Data.Oktade.Classfile.Metadata
+        Data.Oktade.Classfile.Metadata.ConstantPool
+        Data.Oktade.Classfile.Metadata.MagicNumber
+        Data.Oktade.Classfile.Metadata.Version
+        Data.Oktade.Classfile.Class
+        Data.Oktade.Classfile.Class.AccessFlags
+        Data.Oktade.Classfile.Class.Attributes
+        Data.Oktade.Classfile.Class.Fields
+        Data.Oktade.Classfile.Class.Fields.AccessFlags
+        Data.Oktade.Classfile.Class.Interfaces
+        Data.Oktade.Classfile.Class.Methods
+        Data.Oktade.Classfile.Class.Parse
+        Data.Oktade.Classfile.Class.SuperClass
+        Data.Oktade.Classfile.Class.ThisClass
+        Data.Oktade.Parse
 
     hs-source-dirs:   src
     default-language: Haskell2010
