@@ -23,6 +23,7 @@ library
         Data.Oktade.Classfile.Class.Fields.AccessFlags
         Data.Oktade.Classfile.Class.Interfaces
         Data.Oktade.Classfile.Class.Methods
+        Data.Oktade.Classfile.Class.Methods.AccessFlags
         Data.Oktade.Classfile.Class.Parse
         Data.Oktade.Classfile.Class.SuperClass
         Data.Oktade.Classfile.Class.ThisClass
