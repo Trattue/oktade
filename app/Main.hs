@@ -3,6 +3,7 @@ module Main where
 import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
 import qualified Data.ByteString.Lazy as BS (readFile)
 import Data.Oktade.Classfile (parseClassfile)
+import Display (display)
 import System.Environment (getArgs)
 import System.Exit (die)
 
@@ -16,7 +17,7 @@ main = do
         Fail i _ e ->
           putStrLn $
             "Failed parsing file " ++ show path ++ ", is it a valid classfile?"
-        Done _ r -> print r
+        Done _ r -> putStrLn $ display r
     _ -> abort
   where
     abort =
