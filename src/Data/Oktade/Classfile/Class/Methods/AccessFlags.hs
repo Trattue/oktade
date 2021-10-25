@@ -6,8 +6,8 @@
 -- flags.
 module Data.Oktade.Classfile.Class.Methods.AccessFlags
   ( -- * Access Flags
-    AccessFlags (..),
-    AccessFlag (..),
+    MethodAccessFlags (..),
+    MethodAccessFlag (..),
   )
 where
 
@@ -22,10 +22,10 @@ import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 --------------------------------------------------------------------------------
 
 -- | List of 'AccessFlag's a field has.
-newtype AccessFlags = AccessFlags [AccessFlag]
+newtype MethodAccessFlags = MethodAccessFlags [MethodAccessFlag]
   deriving (Show)
 
-instance Parse AccessFlags where
+instance Parse MethodAccessFlags where
   parser _ =
     let flags =
           [ Public,
@@ -41,7 +41,7 @@ instance Parse AccessFlags where
             Strict,
             Synthetic
           ]
-     in AccessFlags <$> do
+     in MethodAccessFlags <$> do
           mask <- anyWord16
           return $ foldr (prependIfPresent mask) [] flags
     where
@@ -49,11 +49,11 @@ instance Parse AccessFlags where
         | m .&. value16 f == value16 f = f : acc
         | otherwise = acc
 
-instance Unparse AccessFlags where
-  unparser _ (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
+instance Unparse MethodAccessFlags where
+  unparser _ (MethodAccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
 
 -- | Represents a single field access flag.
-data AccessFlag
+data MethodAccessFlag
   = -- | Declared public, may be accessed from outside its package.
     Public
   | -- | Declared private, accessible only within the defining class and other
@@ -81,7 +81,7 @@ data AccessFlag
     Synthetic
   deriving (Show)
 
-instance Word16Constant AccessFlag where
+instance Word16Constant MethodAccessFlag where
   value16 Public = 0x0001
   value16 Private = 0x0002
   value16 Protected = 0x0004

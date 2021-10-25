@@ -13,8 +13,8 @@ where
 import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.ByteParser (anyWord16)
-import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags)
 import Data.Oktade.Classfile.Class.Attributes (Attributes)
+import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref)
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -41,7 +41,7 @@ instance Unparse Fields where
     word16BE (fromIntegral $ length fs) <> foldr ((<>) . unparser m) mempty fs
 
 -- | A single field.
-data Field = Field AccessFlags Utf8Ref Utf8Ref Attributes
+data Field = Field FieldAccessFlags Utf8Ref Utf8Ref Attributes
   deriving (Show)
 
 instance Parse Field where

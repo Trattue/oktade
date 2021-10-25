@@ -6,6 +6,8 @@
 -- fields.
 module Data.Oktade.Classfile.Class.Fields.AccessFlags
   ( -- * Access Flags
+    FieldAccessFlags (..),
+    FieldAccessFlag (..),
   )
 where
 
@@ -20,10 +22,10 @@ import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 --------------------------------------------------------------------------------
 
 -- | List of 'AccessFlag's a field has.
-newtype AccessFlags = AccessFlags [AccessFlag]
+newtype FieldAccessFlags = FieldAccessFlags [FieldAccessFlag]
   deriving (Show)
 
-instance Parse AccessFlags where
+instance Parse FieldAccessFlags where
   parser _ =
     let flags =
           [ Public,
@@ -36,7 +38,7 @@ instance Parse AccessFlags where
             Synthetic,
             Enum
           ]
-     in AccessFlags <$> do
+     in FieldAccessFlags <$> do
           mask <- anyWord16
           return $ foldr (prependIfPresent mask) [] flags
     where
@@ -44,11 +46,11 @@ instance Parse AccessFlags where
         | m .&. value16 f == value16 f = f : acc
         | otherwise = acc
 
-instance Unparse AccessFlags where
-  unparser _ (AccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
+instance Unparse FieldAccessFlags where
+  unparser _ (FieldAccessFlags as) = word16BE $ foldr ((.|.) . value16) 0 as
 
 -- | A single field access flag.
-data AccessFlag
+data FieldAccessFlag
   = -- | Declared public, may be accessed from outside its package.
     Public
   | -- | Declared private, accessible only within the defining class and other
@@ -70,7 +72,7 @@ data AccessFlag
     Enum
   deriving (Show)
 
-instance Word16Constant AccessFlag where
+instance Word16Constant FieldAccessFlag where
   value16 Public = 0x0001
   value16 Private = 0x0002
   value16 Protected = 0x0004
