@@ -24,7 +24,7 @@ The main executable can be used in a similar fashion to `javap`: Run
 ## Development
 ### Prerequisites
 
-A working installation of Haskell (GHC 9.0.1) and cabal (3.4.0.0). The easiest
+A working installation of Haskell (GHC 9.0.1) and cabal (3.6.2.0). The easiest
 way of obtaining those is using [GHCup](https://www.haskell.org/ghcup/).
 
 ### Development Environment Setup
