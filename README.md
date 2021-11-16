@@ -50,7 +50,7 @@ is 80 (except for stuff like URIs). Make sure to follow all of
 
 For the [.cabal file](oktade.cabal), use `cabal format`.
 
-### Dependency Management
+<!-- ### Dependency Management
 
 Always try using the latest dependencies.
 
@@ -59,7 +59,7 @@ copy those to [oktade.cabal](oktade.cabal). If `cabal outdated` reports any
 outdated dependencies, adjust the versions in [oktade.cabal](oktade.cabal),
 check if the project still builds and works correctly, then run
 `cabal gen-bounds` again and copy those versions to
-[oktade.cabal](oktade.cabal).
+[oktade.cabal](oktade.cabal). -->
 
 ## License
 

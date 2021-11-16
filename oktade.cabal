@@ -43,12 +43,12 @@ executable oktade
     other-modules:    Display
     default-language: Haskell2010
     build-depends:
-        attoparsec >=0.14.1 && <0.15,
-        base >=4.15.0 && <4.16,
-        bytestring >=0.11.1 && <0.12,
-        containers >=0.6.4 && <0.7,
-        directory >=1.3.6 && <1.4,
-        filepath >=1.4.2 && <1.5,
+        attoparsec,
+        base,
+        bytestring,
+        containers,
+        directory,
+        filepath,
         oktade
 
 test-suite oktade-test
@@ -57,7 +57,7 @@ test-suite oktade-test
     hs-source-dirs:   testsuite/tests
     default-language: Haskell2010
     build-depends:
-        base >=4.15.0 && <4.16,
+        base,
         Cabal
 
 benchmark oktade-bench
@@ -66,10 +66,10 @@ benchmark oktade-bench
     hs-source-dirs:   testsuite/benchmarks
     default-language: Haskell2010
     build-depends:
-        attoparsec >=0.14.1 && <0.15,
-        base >=4.15.0 && <4.16,
-        bytestring >=0.11.1 && <0.12,
+        attoparsec,
+        base,
+        bytestring,
         clock,
-        directory >=1.3.6 && <1.4,
-        filepath >=1.4.2 && <1.5,
+        directory,
+        filepath,
         oktade
