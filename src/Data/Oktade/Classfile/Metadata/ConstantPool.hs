@@ -36,7 +36,7 @@ module Data.Oktade.Classfile.Metadata.ConstantPool
     NameAndTypeRef (..),
     Utf8Ref (..),
     ConstantPoolRef (..),
-    BootstrapMethodAttrRef (..),
+    BootstrapMethodAttrRef,
   )
 where
 
@@ -86,8 +86,8 @@ instance Parse ConstantPool where
     -- Yes, this is correct. For some reason, the classfile stores the constant
     -- pool size + 1.
     let entryCount = fromIntegral entryCountPlusOne - 1
-    entries <- countC entryCount 1 parser []
-    return $ ConstantPool $ fromAscList entries
+    entries' <- countC entryCount 1 parser []
+    return $ ConstantPool $ fromAscList entries'
     where
       -- Custom 'count' function for considering the 'constantPoolSize' of
       -- entries.

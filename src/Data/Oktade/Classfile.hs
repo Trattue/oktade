@@ -14,8 +14,8 @@ module Data.Oktade.Classfile
   )
 where
 
-import Data.Attoparsec.ByteString.Lazy (Parser, Result, parse)
-import Data.ByteString.Builder (Builder, toLazyByteString)
+import Data.Attoparsec.ByteString.Lazy (Result, parse)
+import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (ByteString)
 import Data.Oktade.Classfile.Class (Class)
 import qualified Data.Oktade.Classfile.Class.Parse as P

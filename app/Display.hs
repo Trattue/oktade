@@ -20,7 +20,7 @@ import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags (FieldAc
 import Data.Oktade.Classfile.Class.Interfaces (Interfaces (Interfaces))
 import Data.Oktade.Classfile.Class.Methods (Method (Method), Methods (Methods))
 import Data.Oktade.Classfile.Class.Methods.AccessFlags (MethodAccessFlags (MethodAccessFlags))
-import Data.Oktade.Classfile.Class.SuperClass (SuperClass (SuperClass))
+import Data.Oktade.Classfile.Class.SuperClass (SuperClass (Object, SuperClass))
 import Data.Oktade.Classfile.Class.ThisClass (ThisClass (ThisClass))
 import Data.Oktade.Classfile.Metadata (Metadata (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool
@@ -62,7 +62,7 @@ instance Display ConstantPool where
        in "Constant Pool:\n" ++ indent (showEntry l d <$> toAscList m)
     where
       -- Right aligned formatting considering the maximum number of digits.
-      showEntry l d (k, v) =
+      showEntry _ d (k, v) =
         printf ("%" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ display v
 
 instance Display ConstantPoolEntry where
@@ -123,6 +123,7 @@ instance Display ThisClass where
 
 instance Display SuperClass where
   display (SuperClass c) = "Super class: " ++ display c
+  display Object = "Super class: -"
 
 instance Display Interfaces where
   display (Interfaces []) = "Interfaces: -"

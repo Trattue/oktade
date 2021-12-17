@@ -9,8 +9,6 @@ module Data.Oktade.Classfile.Class.ThisClass
   )
 where
 
-import Data.ByteString.Builder (word16BE)
-import Data.Oktade.ByteParser (anyWord16)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (ClassRef)
 import qualified Data.Oktade.Parse as P (parser, unparser)

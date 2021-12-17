@@ -20,7 +20,6 @@ where
 import Data.Attoparsec.ByteString.Lazy (Parser, anyWord8)
 import Data.Bits (Bits, shiftL)
 import Data.Word (Word16, Word32, Word64)
-import Debug.Trace (trace, traceId)
 
 --------------------------------------------------------------------------------
 -- Parsers
@@ -29,9 +28,9 @@ import Debug.Trace (trace, traceId)
 -- | Match any 'WordN'. Takes as arguments the amount of bits @n@ the word will
 -- have and a 'Parser' for the word with @n / s@ bits.
 anyWordN :: (Integral a, Bits b, Num b) => Int -> Parser a -> Parser b
-anyWordN n anyWordHalfN = toWord n <$> anyWordHalfN <*> anyWordHalfN
+anyWordN n anyWordHalfN = toWord <$> anyWordHalfN <*> anyWordHalfN
   where
-    toWord n w1 w2 =
+    toWord w1 w2 =
       let w1' = (fromIntegral w1 `shiftL` (n `div` 2))
        in w1' + fromIntegral w2
 

@@ -14,8 +14,6 @@ where
 -- Metadata
 --------------------------------------------------------------------------------
 
-import Data.Attoparsec.ByteString.Lazy (Parser)
-import Data.ByteString.Builder (Builder)
 import Data.Oktade.Classfile.Metadata.ConstantPool (ConstantPool)
 import Data.Oktade.Classfile.Metadata.MagicNumber (MagicNumber)
 import Data.Oktade.Classfile.Metadata.Version (Version)
