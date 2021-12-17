@@ -10,7 +10,11 @@ import Data.Oktade.ByteConstant
 import Data.Oktade.Classfile (Classfile (..))
 import Data.Oktade.Classfile.Class (Class (..))
 import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags (AccessFlags))
-import Data.Oktade.Classfile.Class.Attributes (Attribute (Unknown), Attributes (Attributes))
+import Data.Oktade.Classfile.Class.Attributes
+  ( Attribute (..),
+    Attributes (..),
+    NSourceFile (..),
+  )
 import Data.Oktade.Classfile.Class.Fields (Field (Field), Fields (Fields))
 import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags (FieldAccessFlags))
 import Data.Oktade.Classfile.Class.Interfaces (Interfaces (Interfaces))
@@ -160,6 +164,8 @@ instance Display Attributes where
   display (Attributes as) = "Attributes:\n" ++ indent (display <$> as)
 
 instance Display Attribute where
+  display (SourceFile (NSourceFile u) u') =
+    "SourceFile " ++ display u ++ " " ++ display u'
   display (Unknown u bs) = "Unknown " ++ display u ++ " " ++ show bs
 
 indent :: [String] -> String

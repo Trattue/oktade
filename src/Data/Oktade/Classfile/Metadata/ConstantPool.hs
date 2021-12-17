@@ -75,7 +75,9 @@ import Data.Word (Word16, Word32, Word64)
 --
 -- More about the constant pool can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
-newtype ConstantPool = ConstantPool (IntMap ConstantPoolEntry)
+newtype ConstantPool = ConstantPool
+  { entries :: IntMap ConstantPoolEntry
+  }
   deriving (Show)
 
 instance Parse ConstantPool where
