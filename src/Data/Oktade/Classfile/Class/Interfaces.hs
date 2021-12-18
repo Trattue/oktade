@@ -29,10 +29,7 @@ newtype Interfaces = Interfaces [ClassRef]
   deriving (Show)
 
 instance Parse Interfaces where
-  parser _ =
-    Interfaces <$> do
-      interfaceCount <- anyWord16
-      count (fromIntegral interfaceCount) P.parser
+  parser _ = Interfaces <$> (anyWord16 >>= flip count P.parser . fromIntegral)
 
 instance Unparse Interfaces where
   unparser _ (Interfaces cs) =

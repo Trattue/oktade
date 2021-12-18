@@ -75,19 +75,18 @@ import Data.Word (Word16, Word32, Word64)
 --
 -- More about the constant pool can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
-newtype ConstantPool = ConstantPool
-  { entries :: IntMap ConstantPoolEntry
-  }
+newtype ConstantPool = ConstantPool {entries :: IntMap ConstantPoolEntry}
   deriving (Show)
 
 instance Parse ConstantPool where
-  parser = do
-    entryCountPlusOne <- anyWord16
-    -- Yes, this is correct. For some reason, the classfile stores the constant
-    -- pool size + 1.
-    let entryCount = fromIntegral entryCountPlusOne - 1
-    entries' <- countC entryCount 1 parser []
-    return $ ConstantPool $ fromAscList entries'
+  parser =
+    ConstantPool <$> do
+      entryCountPlusOne <- anyWord16
+      -- Yes, this is correct. For some reason, the classfile stores the
+      -- constant pool size + 1.
+      let entryCount = fromIntegral entryCountPlusOne - 1
+      entries' <- countC entryCount 1 parser []
+      return $ fromAscList entries'
     where
       -- Custom 'count' function for considering the 'constantPoolSize' of
       -- entries.
@@ -99,7 +98,7 @@ instance Parse ConstantPool where
 
 instance Unparse ConstantPool where
   unparser (ConstantPool m) =
-    word16BE (fromIntegral (sizeC m + 1)) <> foldr ((<>) . unparser) mempty m
+    word16BE (sizeC m + 1) <> foldr ((<>) . unparser) mempty m
     where
       -- Custom 'size' function for considering the 'constantPoolSize' of
       -- entries.
@@ -471,10 +470,7 @@ instance Parse ConstantPoolEntry where
       parserLong = Long <$> parser <*> anyWord64
       parserDouble = Double <$> parser <*> anyWord64
       parserNameAndType = NameAndType <$> parser <*> parser <*> parser
-      parserUtf8 =
-        Utf8 <$> parser <*> do
-          length <- anyWord16
-          A.take (fromIntegral length)
+      parserUtf8 = Utf8 <$> parser <*> (anyWord16 >>= A.take . fromIntegral)
       parserMethodHandle = MethodHandle <$> parser <*> parser <*> parser
       parserMethodType = MethodType <$> parser <*> parser
       parserDynamic = Dynamic <$> parser <*> anyWord16 <*> parser

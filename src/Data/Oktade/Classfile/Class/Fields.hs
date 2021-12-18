@@ -31,10 +31,7 @@ newtype Fields = Fields [Field]
   deriving (Show)
 
 instance Parse Fields where
-  parser m =
-    Fields <$> do
-      fieldCount <- anyWord16
-      count (fromIntegral fieldCount) (parser m)
+  parser m = Fields <$> (anyWord16 >>= flip count (parser m) . fromIntegral)
 
 instance Unparse Fields where
   unparser m (Fields fs) =
@@ -49,7 +46,4 @@ instance Parse Field where
 
 instance Unparse Field where
   unparser m (Field a u u' as) =
-    unparser m a
-      <> P.unparser u
-      <> P.unparser u'
-      <> unparser m as
+    unparser m a <> P.unparser u <> P.unparser u' <> unparser m as

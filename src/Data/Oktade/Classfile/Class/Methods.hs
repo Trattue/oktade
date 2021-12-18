@@ -31,10 +31,7 @@ newtype Methods = Methods [Method]
   deriving (Show)
 
 instance Parse Methods where
-  parser m =
-    Methods <$> do
-      methodCount <- anyWord16
-      count (fromIntegral methodCount) (parser m)
+  parser m = Methods <$> (anyWord16 >>= flip count (parser m) . fromIntegral)
 
 instance Unparse Methods where
   unparser m (Methods ms) =
@@ -48,4 +45,5 @@ instance Parse Method where
   parser m = Method <$> parser m <*> P.parser <*> P.parser <*> parser m
 
 instance Unparse Method where
-  unparser m (Method a u u' as) = unparser m a <> P.unparser u <> P.unparser u' <> unparser m as
+  unparser m (Method a u u' as) =
+    unparser m a <> P.unparser u <> P.unparser u' <> unparser m as

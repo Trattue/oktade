@@ -36,10 +36,7 @@ type Major = Word16
 type Minor = Word16
 
 instance Parse Version where
-  parser = do
-    minor <- anyWord16
-    major <- anyWord16
-    return $ Version major minor
+  parser = flip Version <$> anyWord16 <*> anyWord16
 
 instance Unparse Version where
-  unparser (Version maj min) = word16BE min <> word16BE maj
+  unparser (Version major minor) = word16BE minor <> word16BE major

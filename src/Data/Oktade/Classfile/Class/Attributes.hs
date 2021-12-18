@@ -42,10 +42,7 @@ newtype Attributes = Attributes [Attribute]
   deriving (Show)
 
 instance Parse Attributes where
-  parser m =
-    Attributes <$> do
-      attributeCount <- anyWord16
-      count (fromIntegral attributeCount) (parser m)
+  parser m = Attributes <$> (anyWord16 >>= flip count (parser m) . fromIntegral)
 
 instance Unparse Attributes where
   unparser m (Attributes as) =
@@ -88,14 +85,9 @@ instance Parse Attribute where
           ]
      in choice parsers
     where
-      parserSourceFile =
-        SourceFile <$> parser m <*> do
-          _ <- anyWord32 -- attribute data size
-          P.parser
+      parserSourceFile = SourceFile <$> parser m <*> (anyWord32 >> P.parser)
       parserUnknown =
-        Unknown <$> P.parser <*> do
-          attributeSize <- anyWord32
-          A.take (fromIntegral attributeSize)
+        Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
 
 instance Unparse Attribute where
   unparser m (SourceFile n u) = unparser m n <> word32BE 2 <> P.unparser u
