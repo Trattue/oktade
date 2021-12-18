@@ -3,42 +3,21 @@ module Main
   )
 where
 
-import Control.Applicative (liftA)
-import Control.Monad (forM, forM_, replicateM_, unless)
+import Control.Monad (forM, replicateM_)
 import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
 import qualified Data.ByteString.Lazy as BS (readFile)
 import Data.List (isSuffixOf)
 import Data.Oktade.Classfile (parseClassfile)
 import System.Clock (Clock (Monotonic), diffTimeSpec, getTime, toNanoSecs)
 import System.Directory (doesFileExist, getCurrentDirectory, listDirectory)
-import System.FilePath (takeDirectory, (</>))
-import System.Posix.Internals (puts)
+import System.FilePath ((</>))
 
 main :: IO ()
 main = do
-  putStrLn ""
-  putStrLn $
-    "One iteration of this benchmark parses the whole cfr-tests project"
-      ++ " sequentially."
-  putStrLn "Only file reading and parsing will be measured.\n"
+  intro
   paths <- cfrTestsPaths
-  let warmupCount = 10
-  putStrLn $ "Warmup, running " ++ show warmupCount ++ " iterations..."
-  replicateM_ warmupCount $ parseClassfiles paths
-  let repeatCount = 200
-  putStrLn $ "Benchmark, running " ++ show repeatCount ++ " iterations..."
-  start <- getTime Monotonic
-  replicateM_ repeatCount $ parseClassfiles paths
-  end <- getTime Monotonic
-  let nsDuration = toNanoSecs (diffTimeSpec start end)
-  let msDuration = nsDuration `div` 1000000
-  let avgMsDuration = nsDuration `div` fromIntegral repeatCount `div` 1000000
-  putStrLn $
-    "Benchmark took "
-      ++ show msDuration
-      ++ "ms ("
-      ++ show avgMsDuration
-      ++ "ms per iteration in average).\n"
+  warmup 10 paths
+  benchmark 200 paths
 
 cfrTestsPaths :: IO [FilePath]
 cfrTestsPaths = do
@@ -58,11 +37,48 @@ cfrTestsPaths = do
         content <- listDirectory p
         concat <$> forM ((p </>) <$> content) (walk fs)
 
+intro :: IO ()
+intro = do
+  putStrLn $
+    "\nOne iteration of this benchmark parses the whole cfr-tests project"
+      ++ " sequentially."
+  putStrLn
+    "Only file reading and parsing will be measured.\n"
+
+warmup :: Int -> [FilePath] -> IO ()
+warmup c ps = do
+  putStrLn $ "Warmup, running " ++ show c ++ " iterations..."
+  run c ps
+
+benchmark :: Int -> [FilePath] -> IO ()
+benchmark c ps = do
+  putStrLn $ "Benchmark, running " ++ show c ++ " iterations..."
+  nsDuration <- timeNanoSecs $ run c ps
+  let msDuration = nsDuration `div` 1000000
+  let avgMsDuration = nsDuration `div` fromIntegral c `div` 1000000
+  evaluation msDuration avgMsDuration
+
+timeNanoSecs :: IO () -> IO Integer
+timeNanoSecs a = do
+  start <- getTime Monotonic
+  a
+  end <- getTime Monotonic
+  return $ toNanoSecs (diffTimeSpec start end)
+
+run :: Int -> [FilePath] -> IO ()
+run c ps = replicateM_ c $ parseClassfiles ps
+
 parseClassfiles :: [FilePath] -> IO ()
 parseClassfiles = mapM_ parse
   where
     parse p = do
       classfile <- BS.readFile p
       case parseClassfile classfile of
-        Fail i c e -> putStrLn $ "Warning: Failed parsing " ++ show p
-        Done i r -> return ()
+        Fail {} -> putStrLn $ "Warning: Failed parsing " ++ show p
+        Done {} -> return ()
+
+evaluation :: Integer -> Integer -> IO ()
+evaluation ms avgMs =
+  putStrLn $
+    "Benchmark took " ++ show ms ++ "ms (" ++ show avgMs
+      ++ "ms per iteration in average).\n"
