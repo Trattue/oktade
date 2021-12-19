@@ -18,7 +18,7 @@ module Data.Oktade.ByteParser
 where
 
 import Data.Attoparsec.ByteString.Lazy (Parser, anyWord8)
-import Data.Bits (Bits, shiftL)
+import Data.Bits (Bits, shift)
 import Data.Word (Word16, Word32, Word64)
 
 --------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ anyWordN :: (Integral a, Bits b, Num b) => Int -> Parser a -> Parser b
 anyWordN n anyWordHalfN = toWord <$> anyWordHalfN <*> anyWordHalfN
   where
     toWord w1 w2 =
-      let w1' = (fromIntegral w1 `shiftL` (n `div` 2))
+      let w1' = (fromIntegral w1 `shift` (n `div` 2))
        in w1' + fromIntegral w2
 
 -- | Match any 'Word16'.
@@ -52,7 +52,7 @@ anyWord32 = anyWordN 32 anyWord16
 anyWord64 :: Parser Word64
 anyWord64 = anyWordN 64 anyWord32
 
--- | Match any value supplied by the 'Parser' fullfilling the predicate @p@.
+-- | Match any value supplied by the 'Parser' fulfilling the predicate @p@.
 satisfyN :: Show b => Parser b -> (b -> Bool) -> Parser b
 satisfyN f p = do
   w <- f
@@ -60,15 +60,15 @@ satisfyN f p = do
     then return w
     else fail "satisfyN"
 
--- | Match any 'Word16' fullfilling the predicate.
+-- | Match any 'Word16' fulfilling the predicate.
 satisfy16 :: (Word16 -> Bool) -> Parser Word16
 satisfy16 = satisfyN anyWord16
 
--- | Match any 'Word32' fullfilling the predicate.
+-- | Match any 'Word32' fulfilling the predicate.
 satisfy32 :: (Word32 -> Bool) -> Parser Word32
 satisfy32 = satisfyN anyWord32
 
--- | Match any 'Word64' fullfilling the predicate.
+-- | Match any 'Word64' fulfilling the predicate.
 satisfy64 :: (Word64 -> Bool) -> Parser Word64
 satisfy64 = satisfyN anyWord64
 
