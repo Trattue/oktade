@@ -1,14 +1,18 @@
 # oktade
 
 Parser for JVM classfiles, built upon the parser combinator library
-[attoparsec](https://hackage.haskell.org/package/attoparsec).
+[attoparsec](https://hackage.haskell.org/package/attoparsec). Classfile versions
+targeted for correct parsing are the same as of JDK for Java SE 17: 45 - 61
+(which corresponds to Java SE 1.0.2 - 17).
 
-This software is still in early development and not ready fo serious usage yet.
+**This software is still in early development and not ready for serious usage
+yet.**
 
 Oktade is able to parse entire classfiles correctly, however some things still
 need to be done:
-* Argument parsing (including the bytecode parsing). Currently, all arguments
-  are represented as bytestrings in their most general form possible.
+* Argument parsing. Currently, all arguments are represented as bytestrings in
+their most general form possible.
+  * Bytecode parsing.
 * Signature string parsing. Currently, signatures are stored as bytestrings.
 * MUTF-8 decoding and encoding.
 * Write tests.
