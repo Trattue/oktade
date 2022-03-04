@@ -28,8 +28,12 @@ The main executable can be used in a similar fashion to `javap`: Run
 ## Development
 ### Prerequisites
 
-A working installation of Haskell (GHC 9.0.1) and cabal (3.6.2.0). The easiest
-way of obtaining those is using [GHCup](https://www.haskell.org/ghcup/).
+A working installation of Haskell (GHC 8.10.7 or more recent) and cabal
+(3.6.2.0 or more recent). The easiest way of obtaining those is using
+[GHCup](https://www.haskell.org/ghcup/).
+
+During development, try maintaining compatability with the GHC version marked as
+'recommended' in GHCup (currently GHC 8.10.7).
 
 ### Development Environment Setup
 
@@ -42,9 +46,12 @@ Run `cabal build` to produce executables of all targets. This will produce
 executables of the main application, the test application and the benchmark
 application.
 
-For testing, run `cabal test` afterwards.
+For testing, run `cabal test` afterwards. (Currently no tests are implemented.)
 
-For benchmarking, run `cabal bench` afterwards.
+For benchmarking, run `cabal bench` afterwards. This will benchmark oktade
+parsing the whole cfr-tests project for 200 iterations (after a warmup of 10
+iterations). You can find more information on how the benchmark works in the
+files in the [testsuite/benchmarks/](testsuite/benchmarks/) folder.
 
 ### Code Style
 
@@ -53,17 +60,6 @@ is 80 (except for stuff like URIs). Make sure to follow all of
 [hlint](https://github.com/ndmitchell/hlint)'s suggestions.
 
 For the [.cabal file](oktade.cabal), use `cabal format`.
-
-<!-- ### Dependency Management
-
-Always try using the latest dependencies.
-
-Run `cabal gen-bounds` to generate suitable version bounds for dependencies and
-copy those to [oktade.cabal](oktade.cabal). If `cabal outdated` reports any
-outdated dependencies, adjust the versions in [oktade.cabal](oktade.cabal),
-check if the project still builds and works correctly, then run
-`cabal gen-bounds` again and copy those versions to
-[oktade.cabal](oktade.cabal). -->
 
 ## License
 
@@ -75,8 +71,14 @@ Oktade is distributed under the terms of the Apache License (Version 2.0), see
 The oktade repository includes code from other projects which may be licensed
 under other terms and conditions:
 * [cfr_tests](https://github.com/leibnitz27/cfr_tests): Licensed under the MIT
-  License license (see [tests/LICENSE](tests/LICENSE) for details).<br>
-  Compiled classes from the project can be found in the [tests/](tests/)
-  directory.<br>
+  License license (see [testsuite/tests/LICENSE](testsuite/tests/LICENSE) for
+  details).<br>
+  Compiled classes from the project can be found in the
+  [testsuite/tests/](testsuite/tests/) directory.<br>
   Thanks to the [CFR](https://github.com/leibnitz27/cfr) developers for making
   their comprehensive test suite open source!
+
+Additionally, this project uses third party libraries. You can find a list of
+those in the [.cabal file](oktade.cabal). While building oktade, your compiler
+may link those libraries to oktade; please check their corresponding licenses
+for legal infomation, e.g. regarding distribution of binaries.

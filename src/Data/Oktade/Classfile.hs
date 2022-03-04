@@ -36,9 +36,9 @@ import Data.Oktade.Parse (Parse, Unparse, parser, unparser)
 -- library, to a data structure representing a classfile ('Classfile') and
 -- unparse this data structure back to a 'ByteString'. Both parsing and
 -- unparsing happen in a lazy manner. To indicate parser failure, oktade simply
--- uses attoparsecs 'Result' type.
+-- uses attoparsec's 'Result' type.
 --
--- Example usage for reading a classfile and printing its parsed content:
+-- Example for reading a classfile and printing its parsed content:
 --
 -- >import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
 -- >import Data.ByteString.Lazy as BS (readFile)
@@ -81,8 +81,8 @@ unparseClassfile = toLazyByteString . unparser
 -- | Top level classfile data structure. In contrary to the structure described
 -- in the JVM specification
 -- (https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1),
--- we do have another layer of abstraction in the classfile by seperating
--- metadata and the actual class data for easier parsing.
+-- we do have another layer of abstraction in the classfile for easier parsing
+-- by seperating metadata and the actual class data.
 data Classfile = Classfile
   { metadata :: Metadata,
     clazz :: Class
@@ -96,4 +96,4 @@ instance Parse Classfile where
     return $ Classfile m c
 
 instance Unparse Classfile where
-  unparser c = unparser (metadata c) <> undefined (metadata c) (clazz c)
+  unparser c = unparser (metadata c) <> P.unparser (metadata c) (clazz c)

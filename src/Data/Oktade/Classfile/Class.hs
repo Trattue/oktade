@@ -10,7 +10,7 @@ import Data.Oktade.Classfile.Class.Attributes (Attributes)
 import Data.Oktade.Classfile.Class.Fields (Fields)
 import Data.Oktade.Classfile.Class.Interfaces (Interfaces)
 import Data.Oktade.Classfile.Class.Methods (Methods)
-import Data.Oktade.Classfile.Class.Parse (Parse (..))
+import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Class.SuperClass (SuperClass)
 import Data.Oktade.Classfile.Class.ThisClass (ThisClass)
 
@@ -35,3 +35,13 @@ instance Parse Class where
       <*> parser m
       <*> parser m
       <*> parser m
+
+instance Unparse Class where
+  unparser m c =
+    unparser m (accessFlags c)
+      <> unparser m (this c)
+      <> unparser m (super c)
+      <> unparser m (interfaces c)
+      <> unparser m (fields c)
+      <> unparser m (methods c)
+      <> unparser m (attributes c)

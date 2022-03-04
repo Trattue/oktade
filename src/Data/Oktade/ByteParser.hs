@@ -25,7 +25,7 @@ import Data.Word (Word16, Word32, Word64)
 -- Parsers
 --------------------------------------------------------------------------------
 
--- | Match any 'WordN'. Takes as arguments the amount of bits @n@ the word will
+-- | Match any @WordN@. Takes as arguments the amount of bits @n@ the word will
 -- have and a 'Parser' for the word with @n / s@ bits.
 anyWordN :: (Integral a, Bits b, Num b) => Int -> Parser a -> Parser b
 anyWordN n anyWordHalfN = toWord <$> anyWordHalfN <*> anyWordHalfN
@@ -61,25 +61,37 @@ satisfyN f p = do
     else fail "satisfyN"
 
 -- | Match any 'Word16' fulfilling the predicate.
+--
+-- Similar to @satisfy@ in the attoparsec library, but for 'Word16's.
 satisfy16 :: (Word16 -> Bool) -> Parser Word16
 satisfy16 = satisfyN anyWord16
 
 -- | Match any 'Word32' fulfilling the predicate.
+--
+-- Similar to @satisfy@ in the attoparsec library, but for 'Word32's.
 satisfy32 :: (Word32 -> Bool) -> Parser Word32
 satisfy32 = satisfyN anyWord32
 
 -- | Match any 'Word64' fulfilling the predicate.
+--
+-- Similar to @satisfy@ in the attoparsec library, but for 'Word64's.
 satisfy64 :: (Word64 -> Bool) -> Parser Word64
 satisfy64 = satisfyN anyWord64
 
 -- | Match a specific 'Word16'.
+--
+-- Similar to @word8@ in the attoparsec library, but for 'Word16's.
 word16 :: Word16 -> Parser Word16
 word16 w = satisfy16 (w ==)
 
 -- | Match a specific 'Word32'.
+--
+-- Similar to @word8@ in the attoparsec library, but for 'Word32's.
 word32 :: Word32 -> Parser Word32
 word32 w = satisfy32 (w ==)
 
 -- | Match a specific 'Word64'.
+--
+-- Similar to @word8@ in the attoparsec library, but for 'Word64's.
 word64 :: Word64 -> Parser Word64
 word64 w = satisfy64 (w ==)
