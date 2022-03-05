@@ -128,8 +128,9 @@ newtype NSourceDebugExtension = NSourceDebugExtension Utf8Ref
 instance Parse NSourceDebugExtension where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "SourceDebugExtension" m NSourceDebugExtension
+    n <-
+      checkAttrName $
+        attrNameParser idx "SourceDebugExtension" m NSourceDebugExtension
     return $ n $ Utf8Ref idx
 
 instance Unparse NSourceDebugExtension where
@@ -226,8 +227,9 @@ newtype NPermittedSubclasses = NPermittedSubclasses Utf8Ref
 instance Parse NPermittedSubclasses where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "PermittedSubclasses" m NPermittedSubclasses
+    n <-
+      checkAttrName $
+        attrNameParser idx "PermittedSubclasses" m NPermittedSubclasses
     return $ n $ Utf8Ref idx
 
 instance Unparse NPermittedSubclasses where
@@ -279,12 +281,13 @@ newtype NRuntimeVisibleAnnotations = NRuntimeVisibleAnnotations Utf8Ref
 instance Parse NRuntimeVisibleAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleAnnotations"
-            m
-            NRuntimeVisibleAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleAnnotations"
+          m
+          NRuntimeVisibleAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleAnnotations where
@@ -296,12 +299,13 @@ newtype NRuntimeInvisibleAnnotations = NRuntimeInvisibleAnnotations Utf8Ref
 instance Parse NRuntimeInvisibleAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleAnnotations"
-            m
-            NRuntimeInvisibleAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleAnnotations"
+          m
+          NRuntimeInvisibleAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleAnnotations where
@@ -313,12 +317,13 @@ newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
 instance Parse NRuntimeVisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleTypeAnnotations"
-            m
-            NRuntimeVisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleTypeAnnotations"
+          m
+          NRuntimeVisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleTypeAnnotations where
@@ -331,12 +336,13 @@ newtype NRuntimeInvisibleTypeAnnotations
 instance Parse NRuntimeInvisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleTypeAnnotations"
-            m
-            NRuntimeInvisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleTypeAnnotations"
+          m
+          NRuntimeInvisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleTypeAnnotations where
