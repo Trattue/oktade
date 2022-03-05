@@ -17,7 +17,12 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 -- This Class
 --------------------------------------------------------------------------------
 
--- | Reference to the current class in the constant pool.
+-- | Reference to the current class in the constant pool. The JVM specification
+-- requires the reference to show to a Class type entry; neither this type nor
+-- the corresponding 'Parse' implementation enforce this.
+--
+-- More about the this class can be learned in the JVM specification:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 newtype ThisClass = ThisClass ClassRef
   deriving (Show)
 

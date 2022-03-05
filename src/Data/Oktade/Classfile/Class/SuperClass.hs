@@ -1,3 +1,8 @@
+-- |
+-- Module: Data.Oktade.Classfile.Class.SuperClass
+-- License: Apache-2.0
+--
+-- Types and functions for parsing and unparsing the classfile super class.
 module Data.Oktade.Classfile.Class.SuperClass
   ( -- * Super Class
     SuperClass (..),
@@ -14,7 +19,13 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 --------------------------------------------------------------------------------
 
 -- | Reference to the super class in the constant pool or 'Object', if no super
--- class is defined.
+-- class is defined. The JVM specification requires the reference to show to a
+-- Class type entry and has some restirctions on access flags of the
+-- corresponding class; neither this type nor the corresponding 'Parse'
+-- implementation enforce this.
+--
+-- More about the super class can be learned in the JVM specification:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
 data SuperClass = Object | SuperClass ClassRef
   deriving (Show)
 

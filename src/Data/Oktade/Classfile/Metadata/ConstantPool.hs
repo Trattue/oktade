@@ -9,6 +9,7 @@ module Data.Oktade.Classfile.Metadata.ConstantPool
     ConstantPool (..),
 
     -- ** Constant Pool Tags
+    -- $constant-pool-tags
     TClass (..),
     TFieldRef (..),
     TMethodRef (..),
@@ -57,18 +58,23 @@ import Data.Word (Word16, Word32, Word64)
 --------------------------------------------------------------------------------
 
 -- $constant-pool
--- The constant pool is arguably one of the larger structures in the classfile,
--- as such the corresponding data structures may seem a bit overwhelming at
--- first.
+-- The constant pool is arguably one of the larger metadata structures in the
+-- classfile, as such the corresponding data structures may seem a bit
+-- overwhelming at first.
 --
 -- As a top level overview, the constant pool is a map of indices to entries
--- (here: 'ConstantPool').
+-- (here, the map is the 'ConstantPool' data structure).
 --
--- Each entry has a specific tag which allows parsers to determine which kind of
--- entry it should parser. These constants are described in the
+-- Each entry structure has a specific tag which allows parsers to determine
+-- what kind of entry it should parse. These constants are described in the
 -- __Constant Pool Tags__ section.
 --
 -- The actual constant pool entries are represented as 'ConstantPoolEntry's.
+-- Most constant pool entries have a size of one entry, however some ('Long' and
+-- 'Double', to be specific) take up two entries in the constant pool. oktade's
+-- constant pool implementation accounts for that (after a night of despair
+-- and confusion due to some classfiles not getting parsed correctly... Let this
+-- be a lesson to read the JVM specification _carefully_).
 
 -- | Represents the classfile constant pool which is a list of
 -- 'ConstantPoolEntry's mapped to their indices.
@@ -98,6 +104,7 @@ instance Parse ConstantPool where
 
 instance Unparse ConstantPool where
   unparser (ConstantPool m) =
+    -- Again this is correct. The classfile stores the constant pool size + 1.
     word16BE (sizeC m + 1) <> foldr ((<>) . unparser) mempty m
     where
       -- Custom 'size' function for considering the 'constantPoolSize' of
@@ -107,6 +114,14 @@ instance Unparse ConstantPool where
 --------------------------------------------------------------------------------
 -- Constant Pool Tags
 --------------------------------------------------------------------------------
+
+-- $constant-pool-tags
+-- Each constant pool entry structure includes a tag for parsers to be able to
+-- differentiate between different entry types. Tags are numeric 'Word8' values.
+--
+-- More about the constant pool entry tags can be learned in the
+-- JVM specification:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
 
 -- | Tag for the 'Class' constant pool entry.
 data TClass = TClass
@@ -334,6 +349,14 @@ instance Unparse TPackage where
 --------------------------------------------------------------------------------
 
 -- | An entry of the constant pool.
+--
+-- The constant pool contains entries. Those entries can be instances of
+-- different structures, defined in this data type. A general constant pool
+-- entry consists of a 'Word8' tag and an arbitrary (but fixed) amount of bytes
+-- storing data.
+--
+-- More about the constant pool entries can be learned in the JVM specification:
+-- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
 data ConstantPoolEntry
   = -- | Class or an interface. Contains a reference to an 'Utf8'
     -- constant encoding the class/interface name.
@@ -500,7 +523,7 @@ instance Unparse ConstantPoolEntry where
 
 -- | Determines the constant pool size of entries. Bytecode has the questionable
 -- feature that 'Double' and 'Long' entries take up two constant pool entry
--- slots instead of one; for parsing and encoding, we need to consider this.
+-- slots instead of one; for parsing and unparsing, we need to account for this.
 constantPoolSize :: Num a => ConstantPoolEntry -> a
 constantPoolSize (Double _ _) = 2
 constantPoolSize (Long _ _) = 2

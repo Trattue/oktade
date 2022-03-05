@@ -22,7 +22,8 @@ import Data.Oktade.Parse (Parse (..), Unparse (..))
 -- | Abstraction over the classfile metadata (here defined as magic number,
 -- version and constant pool). This abstraction is not part of the JVM
 -- specification, but is implemented here for easier parsing of the classfile
--- sections after the constant pool.
+-- sections after the constant pool. (This is due to several sections requiring)
+-- a context, for example the constant pool, for correct parsing.)
 data Metadata = Metadata
   { magicNumber :: MagicNumber,
     version :: Version,

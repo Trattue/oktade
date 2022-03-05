@@ -84,7 +84,11 @@ unparseClassfile = toLazyByteString . unparser
 -- we do have another layer of abstraction in the classfile for easier parsing
 -- by seperating metadata and the actual class data.
 data Classfile = Classfile
-  { metadata :: Metadata,
+  { -- | Abstraction for the first three metadata parts of the classfile:
+    -- magic number, version and constant pool.
+    metadata :: Metadata,
+    -- | Abstraction for the class information parts of the classfile
+    -- (everything except for the 'Metadata' parts).
     clazz :: Class
   }
   deriving (Show)
