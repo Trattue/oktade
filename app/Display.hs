@@ -9,19 +9,33 @@ import Data.Oktade.ByteConstant
   )
 import Data.Oktade.Classfile (Classfile (..))
 import Data.Oktade.Classfile.Class (Class (..))
-import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags (AccessFlags))
+import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags (..))
 import Data.Oktade.Classfile.Class.Attributes
   ( Attribute (..),
     Attributes (..),
     NSourceFile (..),
   )
-import Data.Oktade.Classfile.Class.Fields (Field (Field), Fields (Fields))
-import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags (FieldAccessFlags))
-import Data.Oktade.Classfile.Class.Interfaces (Interfaces (Interfaces))
-import Data.Oktade.Classfile.Class.Methods (Method (Method), Methods (Methods))
-import Data.Oktade.Classfile.Class.Methods.AccessFlags (MethodAccessFlags (MethodAccessFlags))
-import Data.Oktade.Classfile.Class.SuperClass (SuperClass (Object, SuperClass))
-import Data.Oktade.Classfile.Class.ThisClass (ThisClass (ThisClass))
+import Data.Oktade.Classfile.Class.Fields (Field (..), Fields (..))
+import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags (..))
+import Data.Oktade.Classfile.Class.Fields.Attributes
+  ( FieldAttribute,
+    FieldAttributes (..),
+  )
+import qualified Data.Oktade.Classfile.Class.Fields.Attributes as FA
+  ( FieldAttribute (..),
+  )
+import Data.Oktade.Classfile.Class.Interfaces (Interfaces (..))
+import Data.Oktade.Classfile.Class.Methods (Method (..), Methods (..))
+import Data.Oktade.Classfile.Class.Methods.AccessFlags (MethodAccessFlags (..))
+import Data.Oktade.Classfile.Class.Methods.Attributes
+  ( MethodAttribute,
+    MethodAttributes (MethodAttributes),
+  )
+import qualified Data.Oktade.Classfile.Class.Methods.Attributes as MA
+  ( MethodAttribute (..),
+  )
+import Data.Oktade.Classfile.Class.SuperClass (SuperClass (..))
+import Data.Oktade.Classfile.Class.ThisClass (ThisClass (..))
 import Data.Oktade.Classfile.Metadata (Metadata (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool
   ( ClassRef (..),
@@ -32,7 +46,7 @@ import Data.Oktade.Classfile.Metadata.ConstantPool
     Utf8Ref (..),
   )
 import Data.Oktade.Classfile.Metadata.MagicNumber (MagicNumber)
-import Data.Oktade.Classfile.Metadata.Version (Version (Version))
+import Data.Oktade.Classfile.Metadata.Version (Version (..))
 import Numeric (showHex)
 import Text.Printf (printf)
 
@@ -148,6 +162,13 @@ instance Display FieldAccessFlags where
   display (FieldAccessFlags as) =
     "Access flags: " ++ intercalate ", " ((toLower <$>) . show <$> as)
 
+instance Display FieldAttributes where
+  display (FieldAttributes []) = "Attributes: -"
+  display (FieldAttributes as) = "Attributes:\n" ++ indent (display <$> as)
+
+instance Display FieldAttribute where
+  display (FA.Unknown u bs) = "Unknown " ++ display u ++ " " ++ show bs
+
 instance Display Methods where
   display (Methods []) = "Methods: -"
   display (Methods ms) = "Methods:\n" ++ indent (display <$> ms)
@@ -159,6 +180,13 @@ instance Display MethodAccessFlags where
   display (MethodAccessFlags []) = "Access flags: -"
   display (MethodAccessFlags as) =
     "Access flags: " ++ intercalate ", " ((toLower <$>) . show <$> as)
+
+instance Display MethodAttributes where
+  display (MethodAttributes []) = "Attributes: -"
+  display (MethodAttributes as) = "Attributes:\n" ++ indent (display <$> as)
+
+instance Display MethodAttribute where
+  display (MA.Unknown u bs) = "Unknown " ++ display u ++ " " ++ show bs
 
 instance Display Attributes where
   display (Attributes []) = "Attributes: -"

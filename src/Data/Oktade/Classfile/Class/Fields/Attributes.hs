@@ -18,7 +18,7 @@ module Data.Oktade.Classfile.Class.Fields.Attributes
     NRuntimeInvisibleTypeAnnotations (..),
 
     -- ** Field Attributes
-    FiledAttribute (..),
+    FieldAttribute (..),
   )
 where
 
@@ -41,7 +41,7 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 --
 -- More about the attributes can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7
-newtype FieldAttributes = FieldAttributes [FiledAttribute]
+newtype FieldAttributes = FieldAttributes [FieldAttribute]
   deriving (Show)
 
 instance Parse FieldAttributes where
@@ -178,12 +178,12 @@ instance Unparse NRuntimeInvisibleTypeAnnotations where
 --------------------------------------------------------------------------------
 
 -- | A single attribute.
-data FiledAttribute
+data FieldAttribute
   = -- | Unknown attribute.
     Unknown Utf8Ref ByteString
   deriving (Show)
 
-instance Parse FiledAttribute where
+instance Parse FieldAttribute where
   parser _ =
     let parsers = [parserUnknown]
      in choice parsers
@@ -191,6 +191,6 @@ instance Parse FiledAttribute where
       parserUnknown =
         Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
 
-instance Unparse FiledAttribute where
+instance Unparse FieldAttribute where
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
