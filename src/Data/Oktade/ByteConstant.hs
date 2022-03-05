@@ -13,7 +13,7 @@ module Data.Oktade.ByteConstant
   )
 where
 
-import Data.ByteString (ByteString, pack)
+import Data.ByteString (ByteString, pack, unpack)
 import Data.Word (Word16, Word32, Word64, Word8)
 
 --------------------------------------------------------------------------------
@@ -56,7 +56,10 @@ class Word64Constant a where
 class ByteStringConstant a where
   -- | The value as 'Word8' list.
   rawValue :: a -> [Word8]
+  rawValue = unpack . value
 
   -- | The value converted to a 'ByteString'.
   value :: a -> ByteString
-  value c = pack $ rawValue c
+  value = pack . rawValue
+
+  {-# MINIMAL rawValue | value #-}
