@@ -8,8 +8,7 @@ module Data.Oktade.Classfile.Class.Attributes
     Attributes (..),
 
     -- ** Attribute Names
-
-    -- *** Class Attribute Names
+    attrNameParser,
     NSourceFile (..),
     NInnerClasses (..),
     NEnclosingMethod (..),
@@ -22,25 +21,6 @@ module Data.Oktade.Classfile.Class.Attributes
     NNestMembers (..),
     NRecord (..),
     NPermittedSubclasses (..),
-
-    -- *** Field Attribute Names
-    NConstantValue (..),
-
-    -- *** Method Attribute Names
-    NCode (..),
-    NExceptions (..),
-    NRuntimeVisibleParameterAnnotations (..),
-    NRuntimeInvisibleParameterAnnotations (..),
-    NAnnotationDefault (..),
-    NMethodParameters (..),
-
-    -- *** Code Attribute Names
-    NLineNumberTable (..),
-    NLocalVariableTable (..),
-    NLocalVariableTypeTable (..),
-    NStackMapTable (..),
-
-    -- *** Shared Attribute Names
     NSynthetic (..),
     NDeprecated (..),
     NSignature (..),
@@ -54,8 +34,7 @@ module Data.Oktade.Classfile.Class.Attributes
   )
 where
 
-import Data.Attoparsec.ByteString (choice)
-import Data.Attoparsec.ByteString.Lazy (count)
+import Data.Attoparsec.ByteString.Lazy (choice, count)
 import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
@@ -77,7 +56,7 @@ import Data.Word (Word16)
 -- Attributes
 --------------------------------------------------------------------------------
 
--- | List of fields a field/method/classfile has.
+-- | List of fields a class has.
 --
 -- More about the attributes can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7
@@ -101,10 +80,6 @@ attrNameParser i n m a = do
   if bs == fromString n
     then Just a
     else Nothing
-
---------------------------------------------------------------------------------
--- Class Attribute Names
---------------------------------------------------------------------------------
 
 newtype NSourceFile = NSourceFile Utf8Ref
   deriving (Show)
@@ -251,164 +226,6 @@ instance Parse NPermittedSubclasses where
 
 instance Unparse NPermittedSubclasses where
   unparser _ (NPermittedSubclasses u) = P.unparser u
-
---------------------------------------------------------------------------------
--- Field Attribute Names
---------------------------------------------------------------------------------
-
-newtype NConstantValue = NConstantValue Utf8Ref
-  deriving (Show)
-
-instance Parse NConstantValue where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "ConstantValue" m NConstantValue
-    return $ n $ Utf8Ref idx
-
-instance Unparse NConstantValue where
-  unparser _ (NConstantValue u) = P.unparser u
-
---------------------------------------------------------------------------------
--- Method Attribute Names
---------------------------------------------------------------------------------
-
-newtype NCode = NCode Utf8Ref
-  deriving (Show)
-
-instance Parse NCode where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "Code" m NCode
-    return $ n $ Utf8Ref idx
-
-instance Unparse NCode where
-  unparser _ (NCode u) = P.unparser u
-
-newtype NExceptions = NExceptions Utf8Ref
-  deriving (Show)
-
-instance Parse NExceptions where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "Exceptions" m NExceptions
-    return $ n $ Utf8Ref idx
-
-instance Unparse NExceptions where
-  unparser _ (NExceptions u) = P.unparser u
-
-newtype NRuntimeVisibleParameterAnnotations
-  = NRuntimeVisibleParameterAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeVisibleParameterAnnotations where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleParameterAnnotations"
-            m
-            NRuntimeVisibleParameterAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeVisibleParameterAnnotations where
-  unparser _ (NRuntimeVisibleParameterAnnotations u) = P.unparser u
-
-newtype NRuntimeInvisibleParameterAnnotations
-  = NRuntimeInvisibleParameterAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeInvisibleParameterAnnotations where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleParameterAnnotations"
-            m
-            NRuntimeInvisibleParameterAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeInvisibleParameterAnnotations where
-  unparser _ (NRuntimeInvisibleParameterAnnotations u) = P.unparser u
-
-newtype NAnnotationDefault = NAnnotationDefault Utf8Ref
-  deriving (Show)
-
-instance Parse NAnnotationDefault where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "AnnotationDefault" m NAnnotationDefault
-    return $ n $ Utf8Ref idx
-
-instance Unparse NAnnotationDefault where
-  unparser _ (NAnnotationDefault u) = P.unparser u
-
-newtype NMethodParameters = NMethodParameters Utf8Ref
-  deriving (Show)
-
-instance Parse NMethodParameters where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "MethodParameters" m NMethodParameters
-    return $ n $ Utf8Ref idx
-
-instance Unparse NMethodParameters where
-  unparser _ (NMethodParameters u) = P.unparser u
-
---------------------------------------------------------------------------------
--- Code Attribute Names
---------------------------------------------------------------------------------
-
-newtype NLineNumberTable = NLineNumberTable Utf8Ref
-  deriving (Show)
-
-instance Parse NLineNumberTable where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "LineNumberTable" m NLineNumberTable
-    return $ n $ Utf8Ref idx
-
-instance Unparse NLineNumberTable where
-  unparser _ (NLineNumberTable u) = P.unparser u
-
-newtype NLocalVariableTable = NLocalVariableTable Utf8Ref
-  deriving (Show)
-
-instance Parse NLocalVariableTable where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "LocalVariableTable" m NLocalVariableTable
-    return $ n $ Utf8Ref idx
-
-instance Unparse NLocalVariableTable where
-  unparser _ (NLocalVariableTable u) = P.unparser u
-
-newtype NLocalVariableTypeTable = NLocalVariableTypeTable Utf8Ref
-  deriving (Show)
-
-instance Parse NLocalVariableTypeTable where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "LocalVariableTypeTable" m NLocalVariableTypeTable
-    return $ n $ Utf8Ref idx
-
-instance Unparse NLocalVariableTypeTable where
-  unparser _ (NLocalVariableTypeTable u) = P.unparser u
-
-newtype NStackMapTable = NStackMapTable Utf8Ref
-  deriving (Show)
-
-instance Parse NStackMapTable where
-  parser m = do
-    idx <- anyWord16
-    let (Just n) = attrNameParser idx "StackMapTable" m NStackMapTable
-    return $ n $ Utf8Ref idx
-
-instance Unparse NStackMapTable where
-  unparser _ (NStackMapTable u) = P.unparser u
 
 --------------------------------------------------------------------------------
 -- Shared Attribute Names

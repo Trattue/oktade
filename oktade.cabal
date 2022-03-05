@@ -12,21 +12,25 @@ library
         Data.Oktade.ByteConstant
         Data.Oktade.ByteParser
         Data.Oktade.Classfile
-        Data.Oktade.Classfile.Metadata
-        Data.Oktade.Classfile.Metadata.ConstantPool
-        Data.Oktade.Classfile.Metadata.MagicNumber
-        Data.Oktade.Classfile.Metadata.Version
         Data.Oktade.Classfile.Class
         Data.Oktade.Classfile.Class.AccessFlags
         Data.Oktade.Classfile.Class.Attributes
         Data.Oktade.Classfile.Class.Fields
         Data.Oktade.Classfile.Class.Fields.AccessFlags
+        Data.Oktade.Classfile.Class.Fields.Attributes
         Data.Oktade.Classfile.Class.Interfaces
         Data.Oktade.Classfile.Class.Methods
         Data.Oktade.Classfile.Class.Methods.AccessFlags
+        Data.Oktade.Classfile.Class.Methods.Attributes
+        Data.Oktade.Classfile.Class.Methods.Code.Attributes
         Data.Oktade.Classfile.Class.Parse
+        Data.Oktade.Classfile.Class.Records.Attributes
         Data.Oktade.Classfile.Class.SuperClass
         Data.Oktade.Classfile.Class.ThisClass
+        Data.Oktade.Classfile.Metadata
+        Data.Oktade.Classfile.Metadata.ConstantPool
+        Data.Oktade.Classfile.Metadata.MagicNumber
+        Data.Oktade.Classfile.Metadata.Version
         Data.Oktade.Parse
 
     hs-source-dirs:   src

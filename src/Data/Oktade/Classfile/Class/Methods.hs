@@ -13,8 +13,8 @@ where
 import Data.Attoparsec.ByteString.Lazy (count)
 import Data.ByteString.Builder (word16BE)
 import Data.Oktade.ByteParser (anyWord16)
-import Data.Oktade.Classfile.Class.Attributes (Attributes)
 import Data.Oktade.Classfile.Class.Methods.AccessFlags (MethodAccessFlags)
+import Data.Oktade.Classfile.Class.Methods.Attributes (MethodAttributes)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref)
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -38,7 +38,7 @@ instance Unparse Methods where
     word16BE (fromIntegral $ length ms) <> foldr ((<>) . unparser m) mempty ms
 
 -- | A single method.
-data Method = Method MethodAccessFlags Utf8Ref Utf8Ref Attributes
+data Method = Method MethodAccessFlags Utf8Ref Utf8Ref MethodAttributes
   deriving (Show)
 
 instance Parse Method where
