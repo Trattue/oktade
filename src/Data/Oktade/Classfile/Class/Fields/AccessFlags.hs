@@ -25,7 +25,7 @@ import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 -- stored as a bit map.
 --
 -- More about the fields access flags can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.5
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.5
 newtype FieldAccessFlags = FieldAccessFlags [FieldAccessFlag]
   deriving (Show)
 

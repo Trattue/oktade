@@ -80,7 +80,7 @@ unparseClassfile = toLazyByteString . unparser
 
 -- | Top level classfile data structure. In contrary to the structure described
 -- in the JVM specification
--- (https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1),
+-- (https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1),
 -- we do have another layer of abstraction in the classfile for easier parsing
 -- by seperating metadata and the actual class data.
 data Classfile = Classfile

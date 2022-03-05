@@ -26,7 +26,7 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 -- | List of fields a classfile has.
 --
 -- Read the JVM specification for more information:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.5
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.5
 newtype Fields = Fields [Field]
   deriving (Show)
 

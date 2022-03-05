@@ -21,7 +21,7 @@ import Data.Word (Word16)
 -- | The classfile version. Consists of a major and a minor version number.
 --
 -- More about the classfile version can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
 --
 -- NB: In the actual classfile, the minor version is before the major version.
 -- 'Parse' and 'Unparse' implementations account for that.

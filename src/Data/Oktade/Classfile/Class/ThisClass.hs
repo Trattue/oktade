@@ -22,7 +22,7 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 -- the corresponding 'Parse' implementation enforce this.
 --
 -- More about the this class can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
 newtype ThisClass = ThisClass ClassRef
   deriving (Show)
 

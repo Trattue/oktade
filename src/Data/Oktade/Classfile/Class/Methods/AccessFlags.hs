@@ -25,7 +25,7 @@ import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 -- stored as a bit map.
 --
 -- More about the method access flags can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.6
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.6
 newtype MethodAccessFlags = MethodAccessFlags [MethodAccessFlag]
   deriving (Show)
 

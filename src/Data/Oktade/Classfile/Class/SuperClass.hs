@@ -25,7 +25,7 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 -- implementation enforce this.
 --
 -- More about the super class can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
 data SuperClass = Object | SuperClass ClassRef
   deriving (Show)
 

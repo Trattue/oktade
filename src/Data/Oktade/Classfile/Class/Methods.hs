@@ -26,7 +26,7 @@ import qualified Data.Oktade.Parse as P (parser, unparser)
 -- | List of methods a classfile has.
 --
 -- Read the JVM specification for more information:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.6
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.6
 newtype Methods = Methods [Method]
   deriving (Show)
 

@@ -21,7 +21,7 @@ import Data.Oktade.Parse (Parse (..), Unparse (..))
 -- | The classfile magic number, 0xCAFEBABE.
 --
 -- More about the magic number can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.1
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
 data MagicNumber = Cafebabe
   deriving (Show, Eq)
 

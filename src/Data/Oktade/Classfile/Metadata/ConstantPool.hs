@@ -80,7 +80,7 @@ import Data.Word (Word16, Word32, Word64)
 -- 'ConstantPoolEntry's mapped to their indices.
 --
 -- More about the constant pool can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 newtype ConstantPool = ConstantPool {entries :: IntMap ConstantPoolEntry}
   deriving (Show)
 
@@ -121,7 +121,7 @@ instance Unparse ConstantPool where
 --
 -- More about the constant pool entry tags can be learned in the
 -- JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 
 -- | Tag for the 'Class' constant pool entry.
 data TClass = TClass
@@ -356,106 +356,106 @@ instance Unparse TPackage where
 -- storing data.
 --
 -- More about the constant pool entries can be learned in the JVM specification:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 data ConstantPoolEntry
   = -- | Class or an interface. Contains a reference to an 'Utf8'
     -- constant encoding the class/interface name.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.1
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.1
     Class TClass Utf8Ref
   | -- | Represents a field. References the 'Class' it belongs to and a
     -- 'NameAndType' constant containing the field information.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
     FieldRef TFieldRef ClassRef NameAndTypeRef
   | -- | Represents a method. References the 'Class' it belongs to and a
     -- 'NameAndType' constant containing the method information.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
     MethodRef TMethodRef ClassRef NameAndTypeRef
   | -- | Represents an interface method. References the 'Class' it belongs to
     -- and a 'NameAndType' constant containing the interface method information.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.2
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
     InterfaceMethodRef TInterfaceMethodRef ClassRef NameAndTypeRef
   | -- | Constant String object. Contains a reference to its 'Utf8'
     -- content.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.3
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.3
     String TString Utf8Ref
   | -- | 32 bit integer constant (int).
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.4
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
     Integer TInteger Word32
   | -- | 32 bit floating point number constant (float).
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.4
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
     Float TFloat Word32
   | -- | 64 bit integer constant (long).
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.5
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5
     Long TLong Word64
   | -- | 64 bit floating point number constant (double).
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.5
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5
     Double TDouble Word64
   | -- | Represents a field/method without information about the class it
     -- belongs to. References the 'Utf8' field/method name and the 'Utf8'
     -- field/method descriptor.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.6
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6
     NameAndType TNameAndType Utf8Ref Utf8Ref
   | -- | String encoded with Modified UTF-8.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.7
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7
     Utf8 TUtf8 ByteString
   | -- | Method handle containing the reference kind and a reference to a
     -- 'ConstantPoolEntry' depending on the reference kind.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.8
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.8
     MethodHandle TMethodHandle MethodRefKind ConstantPoolRef
   | -- | Represents a method type. The 'Utf8Ref' points to the method
     -- descriptor.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.9
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.9
     MethodType TMethodType Utf8Ref
   | -- | Represents a dynamically computed constant, determined when invoking a
     -- corresponding bootstrap method, for example when @ldc@ is called.
     -- Contains a reference to the constant's type.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.10
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.10
     Dynamic TDynamic BootstrapMethodAttrRef NameAndTypeRef
   | -- | Represents a dynamically computed call site, determined when invoking a
     -- corresponding bootstrap method, in this case when @invokedynamic@ is
     -- called. Contains a reference to the call site's type.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.10
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.10
     InvokeDynamic TInvokeDynamic BootstrapMethodAttrRef NameAndTypeRef
   | -- | Represents a module. References its 'Utf8' name.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.11
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.11
     Module TModule Utf8Ref
   | -- | Represents a package exported or opened by a module. References its
     -- 'Utf8' name.
     --
     -- Read the JVM specification for more information:
-    -- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-4.html#jvms-4.4.12
+    -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.12
     Package TPackage Utf8Ref
   deriving (Show)
 
@@ -532,7 +532,7 @@ constantPoolSize _ = 1
 -- | Types of method references used by 'MethodHandle's.
 --
 -- Read the JVM specification for more information:
--- https://docs.oracle.com/javase/specs/jvms/se16/html/jvms-5.html#jvms-5.4.3.5
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html#jvms-5.4.3.5
 data MethodRefKind
   = GetField
   | GetStatic
