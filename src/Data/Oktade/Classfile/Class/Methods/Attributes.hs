@@ -27,7 +27,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.ByteString.Builder (byteString, word16BE, word32BE)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
-import Data.Oktade.Classfile.Class.Attributes (attrNameParser)
+import Data.Oktade.Classfile.Class.Attributes (attrNameParser, checkAttrName)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref (..))
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -61,7 +61,7 @@ newtype NCode = NCode Utf8Ref
 instance Parse NCode where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Code" m NCode
+    n <- checkAttrName $ attrNameParser idx "Code" m NCode
     return $ n $ Utf8Ref idx
 
 instance Unparse NCode where
@@ -73,7 +73,7 @@ newtype NExceptions = NExceptions Utf8Ref
 instance Parse NExceptions where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Exceptions" m NExceptions
+    n <- checkAttrName $ attrNameParser idx "Exceptions" m NExceptions
     return $ n $ Utf8Ref idx
 
 instance Unparse NExceptions where
@@ -86,12 +86,13 @@ newtype NRuntimeVisibleParameterAnnotations
 instance Parse NRuntimeVisibleParameterAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleParameterAnnotations"
-            m
-            NRuntimeVisibleParameterAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleParameterAnnotations"
+          m
+          NRuntimeVisibleParameterAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleParameterAnnotations where
@@ -104,12 +105,13 @@ newtype NRuntimeInvisibleParameterAnnotations
 instance Parse NRuntimeInvisibleParameterAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleParameterAnnotations"
-            m
-            NRuntimeInvisibleParameterAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleParameterAnnotations"
+          m
+          NRuntimeInvisibleParameterAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleParameterAnnotations where
@@ -121,7 +123,9 @@ newtype NAnnotationDefault = NAnnotationDefault Utf8Ref
 instance Parse NAnnotationDefault where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "AnnotationDefault" m NAnnotationDefault
+    n <-
+      checkAttrName $
+        attrNameParser idx "AnnotationDefault" m NAnnotationDefault
     return $ n $ Utf8Ref idx
 
 instance Unparse NAnnotationDefault where
@@ -133,7 +137,8 @@ newtype NMethodParameters = NMethodParameters Utf8Ref
 instance Parse NMethodParameters where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "MethodParameters" m NMethodParameters
+    n <-
+      checkAttrName $ attrNameParser idx "MethodParameters" m NMethodParameters
     return $ n $ Utf8Ref idx
 
 instance Unparse NMethodParameters where

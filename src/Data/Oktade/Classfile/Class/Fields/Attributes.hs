@@ -28,7 +28,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.ByteString.Builder (byteString, word16BE, word32BE)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
-import Data.Oktade.Classfile.Class.Attributes (attrNameParser)
+import Data.Oktade.Classfile.Class.Attributes (attrNameParser, checkAttrName)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref (..))
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -62,7 +62,7 @@ newtype NConstantValue = NConstantValue Utf8Ref
 instance Parse NConstantValue where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "ConstantValue" m NConstantValue
+    n <- checkAttrName $ attrNameParser idx "ConstantValue" m NConstantValue
     return $ n $ Utf8Ref idx
 
 instance Unparse NConstantValue where
@@ -74,7 +74,7 @@ newtype NSynthetic = NSynthetic Utf8Ref
 instance Parse NSynthetic where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Synthetic" m NSynthetic
+    n <- checkAttrName $ attrNameParser idx "Synthetic" m NSynthetic
     return $ n $ Utf8Ref idx
 
 instance Unparse NSynthetic where
@@ -86,7 +86,7 @@ newtype NDeprecated = NDeprecated Utf8Ref
 instance Parse NDeprecated where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Deprecated" m NDeprecated
+    n <- checkAttrName $ attrNameParser idx "Deprecated" m NDeprecated
     return $ n $ Utf8Ref idx
 
 instance Unparse NDeprecated where
@@ -98,7 +98,7 @@ newtype NSignature = NSignature Utf8Ref
 instance Parse NSignature where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Signature" m NSignature
+    n <- checkAttrName $ attrNameParser idx "Signature" m NSignature
     return $ n $ Utf8Ref idx
 
 instance Unparse NSignature where
@@ -110,12 +110,13 @@ newtype NRuntimeVisibleAnnotations = NRuntimeVisibleAnnotations Utf8Ref
 instance Parse NRuntimeVisibleAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleAnnotations"
-            m
-            NRuntimeVisibleAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleAnnotations"
+          m
+          NRuntimeVisibleAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleAnnotations where
@@ -127,12 +128,13 @@ newtype NRuntimeInvisibleAnnotations = NRuntimeInvisibleAnnotations Utf8Ref
 instance Parse NRuntimeInvisibleAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleAnnotations"
-            m
-            NRuntimeInvisibleAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleAnnotations"
+          m
+          NRuntimeInvisibleAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleAnnotations where
@@ -144,12 +146,13 @@ newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
 instance Parse NRuntimeVisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleTypeAnnotations"
-            m
-            NRuntimeVisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleTypeAnnotations"
+          m
+          NRuntimeVisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleTypeAnnotations where
@@ -162,12 +165,13 @@ newtype NRuntimeInvisibleTypeAnnotations
 instance Parse NRuntimeInvisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleTypeAnnotations"
-            m
-            NRuntimeInvisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleTypeAnnotations"
+          m
+          NRuntimeInvisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleTypeAnnotations where

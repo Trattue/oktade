@@ -58,14 +58,22 @@ executable oktade
         oktade
 
 test-suite oktade-test
-    type:             detailed-0.9
-    test-module:      OktadeTest
-    hs-source-dirs:   testsuite/tests
-    default-language: Haskell2010
-    ghc-options:      -Wall
+    type:               exitcode-stdio-1.0
+    main-is:            OktadeTest.hs
+    build-tool-depends: hspec-discover:hspec-discover
+    hs-source-dirs:     testsuite/tests
+    other-modules:      Data.Oktade.ClassfileSpec
+    default-language:   Haskell2010
+    ghc-options:        -Wall
     build-depends:
         base,
-        Cabal
+        hspec,
+        oktade,
+        attoparsec,
+        bytestring,
+        containers,
+        directory,
+        filepath
 
 benchmark oktade-bench
     type:             exitcode-stdio-1.0

@@ -27,7 +27,7 @@ import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.ByteString.Builder (byteString, word16BE, word32BE)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
-import Data.Oktade.Classfile.Class.Attributes (attrNameParser)
+import Data.Oktade.Classfile.Class.Attributes (attrNameParser, checkAttrName)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref (..))
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -61,7 +61,7 @@ newtype NLineNumberTable = NLineNumberTable Utf8Ref
 instance Parse NLineNumberTable where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "LineNumberTable" m NLineNumberTable
+    n <- checkAttrName $ attrNameParser idx "LineNumberTable" m NLineNumberTable
     return $ n $ Utf8Ref idx
 
 instance Unparse NLineNumberTable where
@@ -73,8 +73,9 @@ newtype NLocalVariableTable = NLocalVariableTable Utf8Ref
 instance Parse NLocalVariableTable where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "LocalVariableTable" m NLocalVariableTable
+    n <-
+      checkAttrName $
+        attrNameParser idx "LocalVariableTable" m NLocalVariableTable
     return $ n $ Utf8Ref idx
 
 instance Unparse NLocalVariableTable where
@@ -86,8 +87,9 @@ newtype NLocalVariableTypeTable = NLocalVariableTypeTable Utf8Ref
 instance Parse NLocalVariableTypeTable where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser idx "LocalVariableTypeTable" m NLocalVariableTypeTable
+    n <-
+      checkAttrName $
+        attrNameParser idx "LocalVariableTypeTable" m NLocalVariableTypeTable
     return $ n $ Utf8Ref idx
 
 instance Unparse NLocalVariableTypeTable where
@@ -99,7 +101,7 @@ newtype NStackMapTable = NStackMapTable Utf8Ref
 instance Parse NStackMapTable where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "StackMapTable" m NStackMapTable
+    n <- checkAttrName $ attrNameParser idx "StackMapTable" m NStackMapTable
     return $ n $ Utf8Ref idx
 
 instance Unparse NStackMapTable where
@@ -111,12 +113,13 @@ newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
 instance Parse NRuntimeVisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeVisibleTypeAnnotations"
-            m
-            NRuntimeVisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleTypeAnnotations"
+          m
+          NRuntimeVisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeVisibleTypeAnnotations where
@@ -129,12 +132,13 @@ newtype NRuntimeInvisibleTypeAnnotations
 instance Parse NRuntimeInvisibleTypeAnnotations where
   parser m = do
     idx <- anyWord16
-    let (Just n) =
-          attrNameParser
-            idx
-            "RuntimeInvisibleTypeAnnotations"
-            m
-            NRuntimeInvisibleTypeAnnotations
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleTypeAnnotations"
+          m
+          NRuntimeInvisibleTypeAnnotations
     return $ n $ Utf8Ref idx
 
 instance Unparse NRuntimeInvisibleTypeAnnotations where

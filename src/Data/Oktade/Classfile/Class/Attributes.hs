@@ -9,6 +9,7 @@ module Data.Oktade.Classfile.Class.Attributes
 
     -- ** Attribute Names
     attrNameParser,
+    checkAttrName,
     NSourceFile (..),
     NInnerClasses (..),
     NEnclosingMethod (..),
@@ -81,13 +82,17 @@ attrNameParser i n m a = do
     then Just a
     else Nothing
 
+checkAttrName :: MonadFail m => Maybe a -> m a
+checkAttrName (Just n) = return n
+checkAttrName _ = fail ""
+
 newtype NSourceFile = NSourceFile Utf8Ref
   deriving (Show)
 
 instance Parse NSourceFile where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "SourceFile" m NSourceFile
+    n <- checkAttrName $ attrNameParser idx "SourceFile" m NSourceFile
     return $ n $ Utf8Ref idx
 
 instance Unparse NSourceFile where
@@ -99,7 +104,7 @@ newtype NInnerClasses = NInnerClasses Utf8Ref
 instance Parse NInnerClasses where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "InnerClasses" m NInnerClasses
+    n <- checkAttrName $ attrNameParser idx "InnerClasses" m NInnerClasses
     return $ n $ Utf8Ref idx
 
 instance Unparse NInnerClasses where
@@ -111,7 +116,7 @@ newtype NEnclosingMethod = NEnclosingMethod Utf8Ref
 instance Parse NEnclosingMethod where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "EnclosingMethod" m NEnclosingMethod
+    n <- checkAttrName $ attrNameParser idx "EnclosingMethod" m NEnclosingMethod
     return $ n $ Utf8Ref idx
 
 instance Unparse NEnclosingMethod where
@@ -136,7 +141,8 @@ newtype NBootstrapMethods = NBootstrapMethods Utf8Ref
 instance Parse NBootstrapMethods where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "BootstrapMethods" m NBootstrapMethods
+    n <-
+      checkAttrName $ attrNameParser idx "BootstrapMethods" m NBootstrapMethods
     return $ n $ Utf8Ref idx
 
 instance Unparse NBootstrapMethods where
@@ -148,7 +154,7 @@ newtype NModule = NModule Utf8Ref
 instance Parse NModule where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Module" m NModule
+    n <- checkAttrName $ attrNameParser idx "Module" m NModule
     return $ n $ Utf8Ref idx
 
 instance Unparse NModule where
@@ -160,7 +166,7 @@ newtype NModulePackages = NModulePackages Utf8Ref
 instance Parse NModulePackages where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "ModulePackages" m NModulePackages
+    n <- checkAttrName $ attrNameParser idx "ModulePackages" m NModulePackages
     return $ n $ Utf8Ref idx
 
 instance Unparse NModulePackages where
@@ -172,7 +178,7 @@ newtype NModuleMainClass = NModuleMainClass Utf8Ref
 instance Parse NModuleMainClass where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "ModuleMainClass" m NModuleMainClass
+    n <- checkAttrName $ attrNameParser idx "ModuleMainClass" m NModuleMainClass
     return $ n $ Utf8Ref idx
 
 instance Unparse NModuleMainClass where
@@ -184,7 +190,7 @@ newtype NNestHost = NNestHost Utf8Ref
 instance Parse NNestHost where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "NestHost" m NNestHost
+    n <- checkAttrName $ attrNameParser idx "NestHost" m NNestHost
     return $ n $ Utf8Ref idx
 
 instance Unparse NNestHost where
@@ -196,7 +202,7 @@ newtype NNestMembers = NNestMembers Utf8Ref
 instance Parse NNestMembers where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "NestMembers" m NNestMembers
+    n <- checkAttrName $ attrNameParser idx "NestMembers" m NNestMembers
     return $ n $ Utf8Ref idx
 
 instance Unparse NNestMembers where
@@ -208,7 +214,7 @@ newtype NRecord = NRecord Utf8Ref
 instance Parse NRecord where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Record" m NRecord
+    n <- checkAttrName $ attrNameParser idx "Record" m NRecord
     return $ n $ Utf8Ref idx
 
 instance Unparse NRecord where
@@ -237,7 +243,7 @@ newtype NSynthetic = NSynthetic Utf8Ref
 instance Parse NSynthetic where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Synthetic" m NSynthetic
+    n <- checkAttrName $ attrNameParser idx "Synthetic" m NSynthetic
     return $ n $ Utf8Ref idx
 
 instance Unparse NSynthetic where
@@ -249,7 +255,7 @@ newtype NDeprecated = NDeprecated Utf8Ref
 instance Parse NDeprecated where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Deprecated" m NDeprecated
+    n <- checkAttrName $ attrNameParser idx "Deprecated" m NDeprecated
     return $ n $ Utf8Ref idx
 
 instance Unparse NDeprecated where
@@ -261,7 +267,7 @@ newtype NSignature = NSignature Utf8Ref
 instance Parse NSignature where
   parser m = do
     idx <- anyWord16
-    let (Just n) = attrNameParser idx "Signature" m NSignature
+    n <- checkAttrName $ attrNameParser idx "Signature" m NSignature
     return $ n $ Utf8Ref idx
 
 instance Unparse NSignature where

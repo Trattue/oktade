@@ -46,12 +46,13 @@ Run `cabal build` to produce executables of all targets. This will produce
 executables of the main application, the test application and the benchmark
 application.
 
-For testing, run `cabal test` afterwards. (Currently no tests are implemented.)
+For testing, run `cabal test --test-show-details=direct` afterwards.
 
 For benchmarking, run `cabal bench` afterwards. This will benchmark oktade
-parsing the whole cfr-tests project for 200 iterations (after a warmup of 10
-iterations). You can find more information on how the benchmark works in the
-files in the [testsuite/benchmarks/](testsuite/benchmarks/) folder.
+parsing and unparsing every classfile in the cfr-tests project for 200
+iterations (after a warmup of 10 iterations). You can find more information on
+how the benchmark works in the files in the
+[testsuite/benchmarks/](testsuite/benchmarks/) folder.
 
 ### Code Style
 

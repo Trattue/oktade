@@ -5,9 +5,10 @@ where
 
 import Control.Monad (forM, replicateM_)
 import Data.Attoparsec.ByteString.Lazy (Result (Done, Fail))
+import Data.ByteString.Lazy (isPrefixOf)
 import qualified Data.ByteString.Lazy as BS (readFile)
 import Data.List (isSuffixOf)
-import Data.Oktade.Classfile (parseClassfile)
+import Data.Oktade.Classfile (parseClassfile, unparseClassfile)
 import System.Clock (Clock (Monotonic), diffTimeSpec, getTime, toNanoSecs)
 import System.Directory (doesFileExist, getCurrentDirectory, listDirectory)
 import System.FilePath ((</>))
@@ -40,8 +41,8 @@ cfrTestsPaths = do
 intro :: IO ()
 intro = do
   putStrLn $
-    "\nOne iteration of this benchmark parses the whole cfr-tests project"
-      ++ " sequentially."
+    "\nOne iteration of this benchmark parses and unparses all classfiles in the"
+      ++ " cfr-tests project sequentially."
   putStrLn
     "Only file reading and parsing will be measured.\n"
 
@@ -75,7 +76,10 @@ parseClassfiles = mapM_ parse
       classfile <- BS.readFile p
       case parseClassfile classfile of
         Fail {} -> putStrLn $ "Warning: Failed parsing " ++ show p
-        Done {} -> return ()
+        (Done _ result) -> do
+          if unparseClassfile result `isPrefixOf` classfile
+            then return ()
+            else putStrLn $ "Warning: Failed homomorphism " ++ show p
 
 evaluation :: Integer -> Integer -> IO ()
 evaluation ms avgMs =

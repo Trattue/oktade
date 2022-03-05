@@ -33,4 +33,4 @@ jobs:
       - name: Build
         run: cabal build $CONFIG
       - name: Test
-        run: cabal test $CONFIG
+        run: cabal test $CONFIG --test-show-details=direct
