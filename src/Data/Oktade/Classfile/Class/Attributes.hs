@@ -45,8 +45,10 @@ import Data.Oktade.ByteParser (anyWord16, anyWord32)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata (Metadata (constantPool))
 import Data.Oktade.Classfile.Metadata.ConstantPool
-  ( ConstantPool (..),
+  ( ClassRef,
+    ConstantPool (..),
     ConstantPoolEntry (Utf8),
+    NameAndTypeRef,
     Utf8Ref (..),
   )
 import qualified Data.Oktade.Parse as P (parser, unparser)
@@ -235,10 +237,6 @@ instance Parse NPermittedSubclasses where
 instance Unparse NPermittedSubclasses where
   unparser _ (NPermittedSubclasses u) = P.unparser u
 
---------------------------------------------------------------------------------
--- Shared Attribute Names
---------------------------------------------------------------------------------
-
 newtype NSynthetic = NSynthetic Utf8Ref
   deriving (Show)
 
@@ -356,6 +354,10 @@ instance Unparse NRuntimeInvisibleTypeAnnotations where
 data Attribute
   = -- | Name of the original source file.
     SourceFile NSourceFile Utf8Ref
+  | -- | Enclosing method of a local or anonymous class.
+    EnclosingMethod NEnclosingMethod ClassRef NameAndTypeRef
+  | -- | Class is synthetic.
+    Synthetic NSynthetic
   | -- | Unknown attribute.
     Unknown Utf8Ref ByteString
   deriving (Show)
@@ -364,15 +366,27 @@ instance Parse Attribute where
   parser m =
     let parsers =
           [ parserSourceFile,
-            parserUnknown
+            parserUnknown,
+            parserEnclosingMethod,
+            parserSynthetic
           ]
      in choice parsers
     where
       parserSourceFile = SourceFile <$> parser m <*> (anyWord32 >> P.parser)
+      parserEnclosingMethod =
+        EnclosingMethod <$> parser m <*> (anyWord32 >> P.parser) <*> P.parser
+      parserSynthetic =
+        Synthetic <$> do
+          n <- parser m
+          _ <- anyWord32
+          return n
       parserUnknown =
         Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
 
 instance Unparse Attribute where
   unparser m (SourceFile n u) = unparser m n <> word32BE 2 <> P.unparser u
+  unparser m (EnclosingMethod n c n') =
+    unparser m n <> word32BE 4 <> P.unparser c <> P.unparser n'
+  unparser m (Synthetic n) = unparser m n <> word32BE 0
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b

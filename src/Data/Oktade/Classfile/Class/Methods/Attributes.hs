@@ -144,24 +144,144 @@ instance Parse NMethodParameters where
 instance Unparse NMethodParameters where
   unparser _ (NMethodParameters u) = P.unparser u
 
+newtype NSynthetic = NSynthetic Utf8Ref
+  deriving (Show)
+
+instance Parse NSynthetic where
+  parser m = do
+    idx <- anyWord16
+    n <- checkAttrName $ attrNameParser idx "Synthetic" m NSynthetic
+    return $ n $ Utf8Ref idx
+
+instance Unparse NSynthetic where
+  unparser _ (NSynthetic u) = P.unparser u
+
+newtype NDeprecated = NDeprecated Utf8Ref
+  deriving (Show)
+
+instance Parse NDeprecated where
+  parser m = do
+    idx <- anyWord16
+    n <- checkAttrName $ attrNameParser idx "Deprecated" m NDeprecated
+    return $ n $ Utf8Ref idx
+
+instance Unparse NDeprecated where
+  unparser _ (NDeprecated u) = P.unparser u
+
+newtype NSignature = NSignature Utf8Ref
+  deriving (Show)
+
+instance Parse NSignature where
+  parser m = do
+    idx <- anyWord16
+    n <- checkAttrName $ attrNameParser idx "Signature" m NSignature
+    return $ n $ Utf8Ref idx
+
+instance Unparse NSignature where
+  unparser _ (NSignature u) = P.unparser u
+
+newtype NRuntimeVisibleAnnotations = NRuntimeVisibleAnnotations Utf8Ref
+  deriving (Show)
+
+instance Parse NRuntimeVisibleAnnotations where
+  parser m = do
+    idx <- anyWord16
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleAnnotations"
+          m
+          NRuntimeVisibleAnnotations
+    return $ n $ Utf8Ref idx
+
+instance Unparse NRuntimeVisibleAnnotations where
+  unparser _ (NRuntimeVisibleAnnotations u) = P.unparser u
+
+newtype NRuntimeInvisibleAnnotations = NRuntimeInvisibleAnnotations Utf8Ref
+  deriving (Show)
+
+instance Parse NRuntimeInvisibleAnnotations where
+  parser m = do
+    idx <- anyWord16
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleAnnotations"
+          m
+          NRuntimeInvisibleAnnotations
+    return $ n $ Utf8Ref idx
+
+instance Unparse NRuntimeInvisibleAnnotations where
+  unparser _ (NRuntimeInvisibleAnnotations u) = P.unparser u
+
+newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
+  deriving (Show)
+
+instance Parse NRuntimeVisibleTypeAnnotations where
+  parser m = do
+    idx <- anyWord16
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeVisibleTypeAnnotations"
+          m
+          NRuntimeVisibleTypeAnnotations
+    return $ n $ Utf8Ref idx
+
+instance Unparse NRuntimeVisibleTypeAnnotations where
+  unparser _ (NRuntimeVisibleTypeAnnotations u) = P.unparser u
+
+newtype NRuntimeInvisibleTypeAnnotations
+  = NRuntimeInvisibleTypeAnnotations Utf8Ref
+  deriving (Show)
+
+instance Parse NRuntimeInvisibleTypeAnnotations where
+  parser m = do
+    idx <- anyWord16
+    n <-
+      checkAttrName $
+        attrNameParser
+          idx
+          "RuntimeInvisibleTypeAnnotations"
+          m
+          NRuntimeInvisibleTypeAnnotations
+    return $ n $ Utf8Ref idx
+
+instance Unparse NRuntimeInvisibleTypeAnnotations where
+  unparser _ (NRuntimeInvisibleTypeAnnotations u) = P.unparser u
+
 --------------------------------------------------------------------------------
 -- Attributes
 --------------------------------------------------------------------------------
 
 -- | A single attribute.
 data MethodAttribute
-  = -- | Unknown attribute.
+  = -- | Method is synthetic.
+    Synthetic NSynthetic
+  | -- | Unknown attribute.
     Unknown Utf8Ref ByteString
   deriving (Show)
 
 instance Parse MethodAttribute where
-  parser _ =
-    let parsers = [parserUnknown]
+  parser m =
+    let parsers =
+          [ parserUnknown,
+            parserSynthetic
+          ]
      in choice parsers
     where
+      parserSynthetic =
+        Synthetic <$> do
+          n <- parser m
+          _ <- anyWord32
+          return n
       parserUnknown =
         Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
 
 instance Unparse MethodAttribute where
+  unparser m (Synthetic n) = unparser m n <> word32BE 0
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b

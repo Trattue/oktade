@@ -30,7 +30,7 @@ import Data.ByteString.Builder (byteString, word16BE, word32BE)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
 import Data.Oktade.Classfile.Class.Attributes (attrNameParser, checkAttrName)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
-import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref (..))
+import Data.Oktade.Classfile.Metadata.ConstantPool (ConstantPoolRef, Utf8Ref (..))
 import qualified Data.Oktade.Parse as P (parser, unparser)
 
 --------------------------------------------------------------------------------
@@ -183,18 +183,35 @@ instance Unparse NRuntimeInvisibleTypeAnnotations where
 
 -- | A single attribute.
 data FieldAttribute
-  = -- | Unknown attribute.
+  = -- | Value of a constant expression.
+    ConstantValue NConstantValue ConstantPoolRef
+  | -- | Field is synthetic.
+    Synthetic NSynthetic
+  | -- | Unknown attribute.
     Unknown Utf8Ref ByteString
   deriving (Show)
 
 instance Parse FieldAttribute where
-  parser _ =
-    let parsers = [parserUnknown]
+  parser m =
+    let parsers =
+          [ parserUnknown,
+            parserConstantValue,
+            parserSynthetic
+          ]
      in choice parsers
     where
+      parserConstantValue =
+        ConstantValue <$> parser m <*> (anyWord32 >> P.parser)
+      parserSynthetic =
+        Synthetic <$> do
+          n <- parser m
+          _ <- anyWord32
+          return n
       parserUnknown =
         Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
 
 instance Unparse FieldAttribute where
+  unparser m (ConstantValue n u) = unparser m n <> word32BE 2 <> P.unparser u
+  unparser m (Synthetic n) = unparser m n <> word32BE 0
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
