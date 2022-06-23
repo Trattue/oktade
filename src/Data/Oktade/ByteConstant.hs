@@ -61,5 +61,3 @@ class ByteStringConstant a where
   -- | The value converted to a 'ByteString'.
   value :: a -> ByteString
   value = pack . rawValue
-
-  {-# MINIMAL rawValue | value #-}
