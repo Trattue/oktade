@@ -79,7 +79,7 @@ instance Unparse Attributes where
 
 attrNameParser :: Word16 -> String -> Metadata -> a -> Maybe a
 attrNameParser i n m a = do
-  let (Just (Utf8 _ bs)) = entries (constantPool m) !? fromIntegral i
+  let (Just (Utf8 bs)) = entries (constantPool m) !? fromIntegral i
   if bs == fromString n
     then Just a
     else Nothing

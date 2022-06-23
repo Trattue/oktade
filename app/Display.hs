@@ -80,27 +80,27 @@ instance Display ConstantPool where
         printf ("%" ++ show d ++ "s") ("#" ++ show k) ++ " = " ++ display v
 
 instance Display ConstantPoolEntry where
-  display (Data.Oktade.Classfile.Metadata.ConstantPool.Class _ u) =
+  display (Data.Oktade.Classfile.Metadata.ConstantPool.Class u) =
     "Class " ++ display u
-  display (FieldRef _ c n) = "FieldRef " ++ display c ++ " " ++ display n
-  display (MethodRef _ c n) = "MethodRef " ++ display c ++ " " ++ display n
-  display (InterfaceMethodRef _ c n) =
+  display (FieldRef c n) = "FieldRef " ++ display c ++ " " ++ display n
+  display (MethodRef c n) = "MethodRef " ++ display c ++ " " ++ display n
+  display (InterfaceMethodRef c n) =
     "FieldRef " ++ display c ++ " " ++ display n
-  display (String _ u) = "String " ++ display u
-  display (Integer _ w) = "Integer " ++ show w
-  display (Float _ w) = "Float " ++ show w
-  display (Long _ w) = "Long " ++ show w
-  display (Double _ w) = "Double " ++ show w
-  display (NameAndType _ u u') =
+  display (String u) = "String " ++ display u
+  display (Integer w) = "Integer " ++ show w
+  display (Float w) = "Float " ++ show w
+  display (Long w) = "Long " ++ show w
+  display (Double w) = "Double " ++ show w
+  display (NameAndType u u') =
     "NameAndType " ++ display u ++ " " ++ display u'
-  display (Utf8 _ b) = "Utf8 " ++ show b
-  display (MethodHandle _ m c) =
+  display (Utf8 b) = "Utf8 " ++ show b
+  display (MethodHandle m c) =
     "MethodHandle " ++ show (value8 m) ++ " " ++ display c
-  display (MethodType _ u) = "MethodType " ++ show u
-  display (Dynamic _ b n) = "Dynamic " ++ show b ++ " " ++ display n
-  display (InvokeDynamic _ b n) = "InvokeDynamic " ++ show b ++ " " ++ display n
-  display (Module _ u) = "Module " ++ display u
-  display (Package _ u) = "Package " ++ display u
+  display (MethodType u) = "MethodType " ++ show u
+  display (Dynamic b n) = "Dynamic " ++ show b ++ " " ++ display n
+  display (InvokeDynamic b n) = "InvokeDynamic " ++ show b ++ " " ++ display n
+  display (Module u) = "Module " ++ display u
+  display (Package u) = "Package " ++ display u
 
 instance Display ClassRef where
   display (ClassRef n) = "#" ++ show n
