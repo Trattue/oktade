@@ -15,12 +15,14 @@ module Data.Oktade.Classfile
 where
 
 import Data.Attoparsec.ByteString.Lazy (Result, parse)
-import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Builder (toLazyByteString, word32BE)
 import Data.ByteString.Lazy (ByteString)
+import Data.Oktade.ByteParser (word32)
 import Data.Oktade.Classfile.Class (Class)
 import qualified Data.Oktade.Classfile.Class.Parse as P
 import Data.Oktade.Classfile.Metadata (Metadata)
 import Data.Oktade.Parse (Parse, Unparse, parser, unparser)
+import Data.Word (Word32)
 
 --------------------------------------------------------------------------------
 -- Parsing and Unparsing
@@ -94,10 +96,21 @@ data Classfile = Classfile
   deriving (Show)
 
 instance Parse Classfile where
-  parser = do
-    m <- parser
-    c <- P.parser m
-    return $ Classfile m c
+  parser =
+    word32 magicNumber >> do
+      m <- parser
+      c <- P.parser m
+      return $ Classfile m c
 
 instance Unparse Classfile where
-  unparser c = unparser (metadata c) <> P.unparser (metadata c) (clazz c)
+  unparser c =
+    word32BE magicNumber
+      <> unparser (metadata c)
+      <> P.unparser (metadata c) (clazz c)
+
+-- | The classfile magic number, 0xCAFEBABE.
+--
+-- More about the magic number can be learned in the JVM specification:
+-- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
+magicNumber :: Word32
+magicNumber = 0xCAFEBABE

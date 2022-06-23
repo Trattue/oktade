@@ -1,12 +1,9 @@
 module Display where
 
-import Data.Char (toLower, toUpper)
+import Data.Char (toLower)
 import Data.IntMap (size, toAscList)
 import Data.List (intercalate)
-import Data.Oktade.ByteConstant
-  ( Word32Constant (value32),
-    Word8Constant (value8),
-  )
+import Data.Oktade.ByteConstant (value8)
 import Data.Oktade.Classfile (Classfile (..))
 import Data.Oktade.Classfile.Class (Class (..))
 import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags (..))
@@ -45,9 +42,7 @@ import Data.Oktade.Classfile.Metadata.ConstantPool
     NameAndTypeRef (..),
     Utf8Ref (..),
   )
-import Data.Oktade.Classfile.Metadata.MagicNumber (MagicNumber)
 import Data.Oktade.Classfile.Metadata.Version (Version (..))
-import Numeric (showHex)
 import Text.Printf (printf)
 
 class Display a where
@@ -57,11 +52,8 @@ instance Display Classfile where
   display (Classfile m c) = display m ++ display c
 
 instance Display Metadata where
-  display (Metadata m v c) =
-    "Metadata:\n" ++ indent [display m, display v, display c]
-
-instance Display MagicNumber where
-  display m = "Magic number: 0x" ++ (toUpper <$> showHex (value32 m) "")
+  display (Metadata v c) =
+    "Metadata:\n" ++ indent [display v, display c]
 
 instance Display Version where
   display (Version major minor) = "Version: " ++ show major ++ "." ++ show minor

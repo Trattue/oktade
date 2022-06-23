@@ -24,7 +24,8 @@ import Data.Word (Word16)
 -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1
 --
 -- NB: In the actual classfile, the minor version is before the major version.
--- 'Parse' and 'Unparse' implementations account for that.
+-- 'Parse' and 'Unparse' implementations account for that, you don't have to
+-- think about it.
 data Version = Version Major Minor
   deriving (Show)
 

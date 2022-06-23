@@ -29,7 +29,6 @@ library
         Data.Oktade.Classfile.Class.ThisClass
         Data.Oktade.Classfile.Metadata
         Data.Oktade.Classfile.Metadata.ConstantPool
-        Data.Oktade.Classfile.Metadata.MagicNumber
         Data.Oktade.Classfile.Metadata.Version
         Data.Oktade.Parse
 

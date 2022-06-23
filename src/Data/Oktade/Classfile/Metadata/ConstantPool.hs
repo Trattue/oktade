@@ -55,7 +55,7 @@ import Data.Word (Word16, Word32, Word64, Word8)
 -- 'Double', to be specific) take up two entries in the constant pool. Oktade's
 -- constant pool implementation accounts for that (after a night of despair
 -- and confusion due to some classfiles not getting parsed correctly... Let this
--- be a lesson to read the JVM specification _carefully_).
+-- be a lesson to read the JVM specification /carefully/).
 
 -- | Represents the classfile constant pool which is a list of
 -- 'ConstantPoolEntry's mapped to their indices.
@@ -98,11 +98,13 @@ instance Unparse ConstantPool where
 
 -- | An entry of the constant pool.
 --
--- The constant pool contains entries. Those entries can be instances of
--- different structures, defined in this data type. A general constant pool
--- entry consists of a 'Word8' tag and an arbitrary (but fixed) amount of bytes
--- storing data. We only expose the data, not the tags (so you don't have to
--- think about those).
+-- The constant pool contains entries; those can be instances of different
+-- structures, defined in this data type. A general constant pool entry contains
+-- one or several data fields.
+--
+-- NB: A general constant pool entry consists of a 'Word8' tag and an arbitrary
+-- (but fixed) amount of bytes storing data. We only expose the parsed data, not
+-- the tags (so you don't have to think about those).
 --
 -- More about the constant pool entries can be learned in the JVM specification:
 -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
@@ -212,6 +214,8 @@ instance Parse ConstantPoolEntry where
   parser = anyWord8 >>= parser'
     where
       parser' t
+        -- Guards map the tag to the parser of the struct. This is used over
+        -- attoparsec's choice function to improve performance.
         | t == classTag = parserClass
         | t == fieldRefTag = parserFieldRef
         | t == methodRefTag = parserMethodRef
