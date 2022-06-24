@@ -32,6 +32,7 @@ module Data.Oktade.Classfile.Class.Attributes
 
     -- ** Class Attributes
     Attribute (..),
+    InnerClass (..),
   )
 where
 
@@ -354,10 +355,13 @@ instance Unparse NRuntimeInvisibleTypeAnnotations where
 data Attribute
   = -- | Name of the original source file.
     SourceFile NSourceFile Utf8Ref
+  | InnerClasses NInnerClasses [InnerClass]
   | -- | Enclosing method of a local or anonymous class.
     EnclosingMethod NEnclosingMethod ClassRef NameAndTypeRef
+  | SourceDebugExtension NSourceDebugExtension ByteString
   | -- | Class is synthetic.
     Synthetic NSynthetic
+  | Deprecated NDeprecated
   | -- | Unknown attribute.
     Unknown Utf8Ref ByteString
   deriving (Show)
@@ -366,17 +370,34 @@ instance Parse Attribute where
   parser m =
     let parsers =
           [ parserSourceFile,
-            parserUnknown,
+            parserInnerClasses,
             parserEnclosingMethod,
-            parserSynthetic
+            parserSourceDebugExtension,
+            parserSynthetic,
+            parserDeprecated,
+            parserUnknown
           ]
      in choice parsers
     where
       parserSourceFile = SourceFile <$> parser m <*> (anyWord32 >> P.parser)
+      parserInnerClasses =
+        InnerClasses
+          <$> parser m
+          <*> (anyWord32 >> anyWord16 >>= parseMultiple m)
+      parseMultiple md c = count (fromIntegral c) (parser md)
       parserEnclosingMethod =
         EnclosingMethod <$> parser m <*> (anyWord32 >> P.parser) <*> P.parser
+      parserSourceDebugExtension =
+        SourceDebugExtension
+          <$> parser m
+          <*> (anyWord32 >>= A.take . fromIntegral)
       parserSynthetic =
         Synthetic <$> do
+          n <- parser m
+          _ <- anyWord32
+          return n
+      parserDeprecated =
+        Deprecated <$> do
           n <- parser m
           _ <- anyWord32
           return n
@@ -385,8 +406,26 @@ instance Parse Attribute where
 
 instance Unparse Attribute where
   unparser m (SourceFile n u) = unparser m n <> word32BE 2 <> P.unparser u
+  unparser m (InnerClasses n is) =
+    unparser m n
+      <> word32BE (fromIntegral (2 + 8 * length is))
+      <> word16BE (fromIntegral $ length is)
+      <> foldr ((<>) . unparser m) mempty is
   unparser m (EnclosingMethod n c n') =
     unparser m n <> word32BE 4 <> P.unparser c <> P.unparser n'
+  unparser m (SourceDebugExtension n b) =
+    unparser m n <> word32BE (fromIntegral $ BS.length b) <> byteString b
   unparser m (Synthetic n) = unparser m n <> word32BE 0
+  unparser m (Deprecated n) = unparser m n <> word32BE 0
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
+
+data InnerClass = InnerClass ClassRef ClassRef Utf8Ref Word16
+  deriving (Show)
+
+instance Parse InnerClass where
+  parser _ = InnerClass <$> P.parser <*> P.parser <*> P.parser <*> anyWord16
+
+instance Unparse InnerClass where
+  unparser _ (InnerClass i o n f) =
+    P.unparser i <> P.unparser o <> P.unparser n <> word16BE f

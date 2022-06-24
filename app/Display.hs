@@ -10,13 +10,19 @@ import Data.Oktade.Classfile.Class.AccessFlags (AccessFlags (..))
 import Data.Oktade.Classfile.Class.Attributes
   ( Attribute (..),
     Attributes (..),
+    InnerClass (..),
+    NDeprecated (..),
+    NEnclosingMethod (..),
+    NInnerClasses (..),
+    NSourceDebugExtension (..),
     NSourceFile (..),
+    NSynthetic (..),
   )
 import Data.Oktade.Classfile.Class.Fields (Field (..), Fields (..))
 import Data.Oktade.Classfile.Class.Fields.AccessFlags (FieldAccessFlags (..))
 import Data.Oktade.Classfile.Class.Fields.Attributes
   ( FieldAttribute,
-    FieldAttributes (..),
+    FieldAttributes (FieldAttributes),
   )
 import qualified Data.Oktade.Classfile.Class.Fields.Attributes as FA
   ( FieldAttribute (..),
@@ -166,7 +172,14 @@ instance Display Methods where
   display (Methods ms) = "Methods:\n" ++ indent (display <$> ms)
 
 instance Display Method where
-  display (Method a u u' as) = "Method:\n" ++ indent [display a, "Name: " ++ display u, "Descriptor: " ++ display u', display as]
+  display (Method a u u' as) =
+    "Method:\n"
+      ++ indent
+        [ display a,
+          "Name: " ++ display u,
+          "Descriptor: " ++ display u',
+          display as
+        ]
 
 instance Display MethodAccessFlags where
   display (MethodAccessFlags []) = "Access flags: -"
@@ -187,7 +200,26 @@ instance Display Attributes where
 instance Display Attribute where
   display (SourceFile (NSourceFile u) u') =
     "SourceFile " ++ display u ++ " " ++ display u'
+  display (InnerClasses (NInnerClasses u) is) =
+    "InnerClasses " ++ display u ++ "\n" ++ indent (display <$> is)
+  display (EnclosingMethod (NEnclosingMethod u) c n') =
+    "EnclosingMethod " ++ display u ++ " " ++ display c ++ display n'
+  display (SourceDebugExtension (NSourceDebugExtension u) bs) =
+    "SourceDebugExtension " ++ display u ++ " " ++ show bs
+  display (Synthetic (NSynthetic u)) = "Synthetic " ++ display u
+  display (Deprecated (NDeprecated u)) = "Deprecated " ++ display u
   display (Unknown u bs) = "Unknown " ++ display u ++ " " ++ show bs
+
+instance Display InnerClass where
+  display (InnerClass i o n f) =
+    "Inner Class: "
+      ++ display i
+      ++ " "
+      ++ display o
+      ++ " "
+      ++ display n
+      ++ " "
+      ++ show f
 
 indent :: [String] -> String
 indent xs = unlines (go <$> xs)

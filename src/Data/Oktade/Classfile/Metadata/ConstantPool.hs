@@ -25,7 +25,7 @@ where
 import Data.Attoparsec.ByteString.Lazy (anyWord8, choice, word8)
 import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as B (length)
+import qualified Data.ByteString as BS (length)
 import Data.ByteString.Builder (byteString, word16BE, word32BE, word64BE)
 import qualified Data.ByteString.Builder as BB (word8)
 import Data.IntMap (IntMap, fromAscList)
@@ -266,7 +266,7 @@ instance Unparse ConstantPoolEntry where
   unparser (NameAndType u u') =
     BB.word8 nameAndTypeTag <> unparser u <> unparser u'
   unparser (Utf8 b) =
-    BB.word8 utf8Tag <> word16BE (fromIntegral (B.length b)) <> byteString b
+    BB.word8 utf8Tag <> word16BE (fromIntegral $ BS.length b) <> byteString b
   unparser (MethodHandle m c) =
     BB.word8 methodHandleTag <> unparser m <> unparser c
   unparser (MethodType u) = BB.word8 methodTypeTag <> unparser u

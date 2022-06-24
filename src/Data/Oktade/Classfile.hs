@@ -19,7 +19,10 @@ import Data.ByteString.Builder (toLazyByteString, word32BE)
 import Data.ByteString.Lazy (ByteString)
 import Data.Oktade.ByteParser (word32)
 import Data.Oktade.Classfile.Class (Class)
-import qualified Data.Oktade.Classfile.Class.Parse as P
+import qualified Data.Oktade.Classfile.Class.Parse as Class
+  ( parser,
+    unparser,
+  )
 import Data.Oktade.Classfile.Metadata (Metadata)
 import Data.Oktade.Parse (Parse, Unparse, parser, unparser)
 import Data.Word (Word32)
@@ -99,14 +102,14 @@ instance Parse Classfile where
   parser =
     word32 magicNumber >> do
       m <- parser
-      c <- P.parser m
+      c <- Class.parser m
       return $ Classfile m c
 
 instance Unparse Classfile where
   unparser c =
     word32BE magicNumber
       <> unparser (metadata c)
-      <> P.unparser (metadata c) (clazz c)
+      <> Class.unparser (metadata c) (clazz c)
 
 -- | The classfile magic number, 0xCAFEBABE.
 --
