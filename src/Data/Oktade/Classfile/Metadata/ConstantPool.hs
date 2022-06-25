@@ -17,6 +17,7 @@ module Data.Oktade.Classfile.Metadata.ConstantPool
     ClassRef (..),
     NameAndTypeRef (..),
     Utf8Ref (..),
+    PackageRef (..),
     ConstantPoolRef (..),
     BootstrapMethodAttrRef,
   )
@@ -441,6 +442,16 @@ instance Parse Utf8Ref where
 
 instance Unparse Utf8Ref where
   unparser (Utf8Ref u) = word16BE u
+
+-- | Reference to an 'Package' constant.
+newtype PackageRef = PackageRef Word16
+  deriving (Show, Eq)
+
+instance Parse PackageRef where
+  parser = PackageRef <$> anyWord16
+
+instance Unparse PackageRef where
+  unparser (PackageRef u) = word16BE u
 
 -- | General reference to a 'ConstantPoolEntry'.
 newtype ConstantPoolRef = ConstantPoolRef Word16

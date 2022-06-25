@@ -26,8 +26,9 @@ spec = do
         Done {} -> return True
     content p = do
       classfile <- BS.readFile p
+      print p
       case parseClassfile classfile of
-        Fail {} -> return False
+        Fail {} -> error $ show p
         (Done _ result) -> do
           return $ unparseClassfile result `BS.isPrefixOf` classfile
 

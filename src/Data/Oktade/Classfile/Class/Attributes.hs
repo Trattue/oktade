@@ -28,6 +28,8 @@ import Data.Oktade.Classfile.Metadata.ConstantPool
   ( ClassRef,
     ConstantPool (..),
     ConstantPoolEntry (Utf8),
+    NameAndTypeRef,
+    PackageRef,
     Utf8Ref (..),
   )
 import qualified Data.Oktade.Parse as P (Parse (parser), unparser)
@@ -57,9 +59,26 @@ instance Unparse Attributes where
 
 -- | A single attribute.
 data Attribute
-  = SourceFile Utf8Ref
-  | InnerClasses [InnerClass]
-  | Unknown Utf8Ref ByteString
+  = -- | Name of the original source file.
+    SourceFile Utf8Ref
+  | -- | Inner classes of the class.
+    InnerClasses [InnerClass]
+  | -- | Enclosing method of a local or anonymous class.
+    EnclosingMethod ClassRef NameAndTypeRef
+  | -- | "Extended debug information", whatever that may be.
+    SourceDebugExtension ByteString
+  | ModulePackages [PackageRef]
+  | ModuleMainClass ClassRef
+  | NestHost ClassRef
+  | NestMembers [ClassRef]
+  | PermittedSubclasses [ClassRef]
+  | -- | Class is synthetic.
+    Synthetic
+  | -- | Class is deprecated.
+    Deprecated
+  | Signature Utf8Ref
+  | -- | Unknown attribute.
+    Unknown Utf8Ref ByteString
   deriving (Show)
 
 instance Parse Attribute where
@@ -72,30 +91,46 @@ instance Parse Attribute where
       parser'' n i
         | n == sourceFileName = parserSourceFile
         | n == innerClassesName = parserInnerClasses
-        | n == enclosingMethodName = parserUnknown i
-        | n == sourceDebugExtensionName = parserUnknown i
-        | n == bootstrapMethodsName = parserUnknown i
-        | n == moduleName = parserUnknown i
-        | n == modulePackagesName = parserUnknown i
-        | n == moduleMainClassName = parserUnknown i
-        | n == nestHostName = parserUnknown i
-        | n == nestMembersName = parserUnknown i
-        | n == recordName = parserUnknown i
-        | n == permittedSubclassesName = parserUnknown i
-        | n == syntheticName = parserUnknown i
-        | n == deprecatedName = parserUnknown i
-        | n == signatureName = parserUnknown i
-        | n == runtimeVisibleAnnotationsName = parserUnknown i
-        | n == runtimeInvisibleAnnotationsName = parserUnknown i
-        | n == runtimeVisibleTypeAnnotationsName = parserUnknown i
-        | n == runtimeInvisibleTypeAnnotationsName = parserUnknown i
-        | otherwise = parserUnknown i
+        | n == enclosingMethodName = parserEnclosingMethod
+        | n == sourceDebugExtensionName = parserSourceDebugExtension
+        | n == bootstrapMethodsName = parserUnknown i -- TODO
+        | n == moduleName = parserUnknown i -- TODO
+        | n == modulePackagesName = parserModulePackages
+        | n == moduleMainClassName = parserModuleMainClass
+        | n == nestHostName = parserNestHost
+        | n == nestMembersName = parserNestMembers
+        | n == recordName = parserUnknown i -- TODO
+        | n == permittedSubclassesName = parserPermittedSubclasses
+        | n == syntheticName = parserSynthetic
+        | n == deprecatedName = parserDeprecated
+        | n == signatureName = parserSignature
+        | n == runtimeVisibleAnnotationsName = parserUnknown i -- TODO
+        | n == runtimeInvisibleAnnotationsName = parserUnknown i -- TODO
+        | n == runtimeVisibleTypeAnnotationsName = parserUnknown i -- TODO
+        | n == runtimeInvisibleTypeAnnotationsName = parserUnknown i -- TODO
+        | otherwise = parserUnknown i -- TODO
       parserSourceFile = anyWord32 >> SourceFile <$> P.parser
       parserInnerClasses =
-        anyWord32 >> InnerClasses <$> (anyWord16 >>= parseMultiple parser)
+        anyWord32 >> InnerClasses <$> (anyWord16 >>= parseMultiple (parser m))
+      parserEnclosingMethod =
+        anyWord32 >> EnclosingMethod <$> P.parser <*> P.parser
+      parserSourceDebugExtension =
+        SourceDebugExtension <$> (anyWord32 >>= A.take . fromIntegral)
+      parserModulePackages =
+        anyWord32 >> ModulePackages <$> (anyWord16 >>= parseMultiple P.parser)
+      parserModuleMainClass = anyWord32 >> ModuleMainClass <$> P.parser
+      parserNestHost = anyWord32 >> NestHost <$> P.parser
+      parserNestMembers =
+        anyWord32 >> NestMembers <$> (anyWord16 >>= parseMultiple P.parser)
+      parserPermittedSubclasses =
+        anyWord32
+          >> PermittedSubclasses <$> (anyWord16 >>= parseMultiple P.parser)
+      parserSynthetic = anyWord32 >> pure Synthetic
+      parserDeprecated = anyWord32 >> pure Deprecated
+      parserSignature = anyWord32 >> Signature <$> P.parser
       parserUnknown i =
         Unknown (Utf8Ref i) <$> (anyWord32 >>= A.take . fromIntegral)
-      parseMultiple p i = count (fromIntegral i) (p m)
+      parseMultiple p i = count (fromIntegral i) p
 
 instance Unparse Attribute where
   unparser m (SourceFile u) =
@@ -105,8 +140,40 @@ instance Unparse Attribute where
       <> word32BE (fromIntegral $ 2 + 8 * length is)
       <> word16BE (fromIntegral $ length is)
       <> foldr ((<>) . unparser m) mempty is
-  unparser _ (Unknown u b) =
-    P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
+  unparser m (EnclosingMethod c n) =
+    nameUnparser enclosingMethodName m
+      <> word32BE 4
+      <> P.unparser c
+      <> P.unparser n
+  unparser m (SourceDebugExtension bs) =
+    nameUnparser sourceDebugExtensionName m
+      <> word32BE (fromIntegral $ BS.length bs)
+      <> byteString bs
+  unparser m (ModulePackages ps) =
+    nameUnparser modulePackagesName m
+      <> word32BE (fromIntegral $ 2 + 2 * length ps)
+      <> word16BE (fromIntegral $ length ps)
+      <> foldr ((<>) . P.unparser) mempty ps
+  unparser m (ModuleMainClass c) =
+    nameUnparser moduleMainClassName m <> word32BE 2 <> P.unparser c
+  unparser m (NestHost c) =
+    nameUnparser nestHostName m <> word32BE 2 <> P.unparser c
+  unparser m (NestMembers cs) =
+    nameUnparser nestMembersName m
+      <> word32BE (fromIntegral $ 2 + 2 * length cs)
+      <> word16BE (fromIntegral $ length cs)
+      <> foldr ((<>) . P.unparser) mempty cs
+  unparser m (PermittedSubclasses cs) =
+    nameUnparser permittedSubclassesName m
+      <> word32BE (fromIntegral $ 2 + 2 * length cs)
+      <> word16BE (fromIntegral $ length cs)
+      <> foldr ((<>) . P.unparser) mempty cs
+  unparser m Synthetic = nameUnparser syntheticName m <> word32BE 2
+  unparser m Deprecated = nameUnparser deprecatedName m <> word32BE 2
+  unparser m (Signature u) =
+    nameUnparser signatureName m <> word32BE 2 <> P.unparser u
+  unparser _ (Unknown u bs) =
+    P.unparser u <> word32BE (fromIntegral $ BS.length bs) <> byteString bs
 
 data InnerClass = InnerClass ClassRef ClassRef Utf8Ref Word16 -- TODO: access flags
   deriving (Show)
@@ -124,7 +191,7 @@ nameUnparser n m = do
   let b = IntMap.filter (== u) $ entries $ constantPool m
   case lookupMin b of
     Just (i, _) -> word16BE $ fromIntegral i
-    Nothing -> error "not implemented" -- TODO: insert
+    Nothing -> error $ "could not find " ++ n -- TODO: insert
 
 sourceFileName :: String
 sourceFileName = "SourceFile"

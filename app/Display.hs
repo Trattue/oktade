@@ -193,7 +193,18 @@ instance Display Attributes where
 
 instance Display Attribute where
   display (SourceFile u) = "SourceFile " ++ display u
-  display (InnerClasses is) = "SourceFile\n" ++ indent (display <$> is)
+  display (InnerClasses is) = "InnerClasses\n" ++ indent (display <$> is)
+  display (EnclosingMethod c n) = "EnclosingMethod " ++ display c ++ display n
+  display (SourceDebugExtension bs) = "SourceDebugExtension " ++ show bs
+  display (ModulePackages ps) = "ModulePackages " ++ unwords (show <$> ps)
+  display (ModuleMainClass c) = "ModuleMainClass " ++ display c
+  display (NestHost c) = "NestHost " ++ display c
+  display (NestMembers cs) = "NestMembers " ++ unwords (show <$> cs)
+  display (PermittedSubclasses cs) =
+    "PermittedSubclasses " ++ unwords (show <$> cs)
+  display Synthetic = "Synthetic"
+  display Deprecated = "Deprecated"
+  display (Signature u) = "Signature " ++ display u
   display (Unknown u bs) = "Unknown " ++ display u ++ " " ++ show bs
 
 instance Display InnerClass where
