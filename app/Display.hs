@@ -40,6 +40,7 @@ import Data.Oktade.Classfile.Metadata.ConstantPool
     ConstantPoolEntry (..),
     ConstantPoolRef (..),
     NameAndTypeRef (..),
+    PackageRef (PackageRef),
     Utf8Ref (..),
   )
 import Data.Oktade.Classfile.Metadata.Version (Version (..))
@@ -102,6 +103,9 @@ instance Display NameAndTypeRef where
 
 instance Display Utf8Ref where
   display (Utf8Ref n) = "#" ++ show n
+
+instance Display PackageRef where
+  display (PackageRef n) = "#" ++ show n
 
 instance Display ConstantPoolRef where
   display (ConstantPoolRef n) = "#" ++ show n
@@ -196,12 +200,12 @@ instance Display Attribute where
   display (InnerClasses is) = "InnerClasses\n" ++ indent (display <$> is)
   display (EnclosingMethod c n) = "EnclosingMethod " ++ display c ++ display n
   display (SourceDebugExtension bs) = "SourceDebugExtension " ++ show bs
-  display (ModulePackages ps) = "ModulePackages " ++ unwords (show <$> ps)
+  display (ModulePackages ps) = "ModulePackages " ++ unwords (display <$> ps)
   display (ModuleMainClass c) = "ModuleMainClass " ++ display c
   display (NestHost c) = "NestHost " ++ display c
-  display (NestMembers cs) = "NestMembers " ++ unwords (show <$> cs)
+  display (NestMembers cs) = "NestMembers " ++ unwords (display <$> cs)
   display (PermittedSubclasses cs) =
-    "PermittedSubclasses " ++ unwords (show <$> cs)
+    "PermittedSubclasses " ++ unwords (display <$> cs)
   display Synthetic = "Synthetic"
   display Deprecated = "Deprecated"
   display (Signature u) = "Signature " ++ display u
