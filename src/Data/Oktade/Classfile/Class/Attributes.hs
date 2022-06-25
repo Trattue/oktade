@@ -25,7 +25,8 @@ import Data.Oktade.ByteParser (anyWord16, anyWord32)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata (Metadata (constantPool))
 import Data.Oktade.Classfile.Metadata.ConstantPool
-  ( ConstantPool (..),
+  ( ClassRef,
+    ConstantPool (..),
     ConstantPoolEntry (Utf8),
     Utf8Ref (..),
   )
@@ -107,7 +108,7 @@ instance Unparse Attribute where
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
 
-data InnerClass = InnerClass Utf8Ref Utf8Ref Utf8Ref Word16 -- TODO: access flags
+data InnerClass = InnerClass ClassRef ClassRef Utf8Ref Word16 -- TODO: access flags
   deriving (Show)
 
 instance Parse InnerClass where
