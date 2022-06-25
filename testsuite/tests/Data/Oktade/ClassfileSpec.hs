@@ -13,7 +13,6 @@ spec :: Spec
 spec = do
   describe "oktade" $ do
     it "parses JVM classfiles" $ do
-      -- TODO: this doesn't seem to be affected by errors? investigate this
       paths <- cfrTestsPaths
       mapM_ (\p -> do parse p `shouldReturn` True) paths
     it "homomorphism parsing and unparsing" $ do
@@ -23,7 +22,7 @@ spec = do
     parse p = do
       classfile <- BS.readFile p
       case parseClassfile classfile of
-        Fail {} -> return False
+        Fail {} -> error $ show p
         Done {} -> return True
     content p = do
       classfile <- BS.readFile p

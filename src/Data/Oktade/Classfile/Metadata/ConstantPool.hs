@@ -208,7 +208,7 @@ data ConstantPoolEntry
     -- Read the JVM specification for more information:
     -- https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.12
     Package Utf8Ref
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Parse ConstantPoolEntry where
   parser = anyWord8 >>= parser'
@@ -233,7 +233,7 @@ instance Parse ConstantPoolEntry where
         | t == invokeDynamicTag = parserInvokeDynamic
         | t == moduleTag = parserModule
         | t == packageTag = parserPackage
-        | otherwise = error "Unknown constant pool stack"
+        | otherwise = fail "Unknown constant pool stack"
       parserClass = Class <$> parser
       parserFieldRef = FieldRef <$> parser <*> parser
       parserMethodRef = MethodRef <$> parser <*> parser
@@ -366,7 +366,7 @@ data MethodRefKind
   | InvokeSpecial
   | NewInvokeSpecial
   | InvokeInterface
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Word8Constant MethodRefKind where
   value8 GetField = 1
@@ -414,7 +414,7 @@ instance Unparse MethodRefKind where
 
 -- | Reference to a 'Class' constant.
 newtype ClassRef = ClassRef Word16
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Parse ClassRef where
   parser = ClassRef <$> anyWord16
@@ -424,7 +424,7 @@ instance Unparse ClassRef where
 
 -- | Reference to a 'NameAndType' constant.
 newtype NameAndTypeRef = NameAndTypeRef Word16
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Parse NameAndTypeRef where
   parser = NameAndTypeRef <$> anyWord16
@@ -434,7 +434,7 @@ instance Unparse NameAndTypeRef where
 
 -- | Reference to an 'Utf8' constant.
 newtype Utf8Ref = Utf8Ref Word16
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Parse Utf8Ref where
   parser = Utf8Ref <$> anyWord16
@@ -444,7 +444,7 @@ instance Unparse Utf8Ref where
 
 -- | General reference to a 'ConstantPoolEntry'.
 newtype ConstantPoolRef = ConstantPoolRef Word16
-  deriving (Show)
+  deriving (Show, Eq)
 
 instance Parse ConstantPoolRef where
   parser = ConstantPoolRef <$> anyWord16

@@ -7,53 +7,29 @@ module Data.Oktade.Classfile.Class.Attributes
   ( -- * Attributes
     Attributes (..),
 
-    -- ** Attribute Names
-    attrNameParser,
-    checkAttrName,
-    NSourceFile (..),
-    NInnerClasses (..),
-    NEnclosingMethod (..),
-    NSourceDebugExtension (..),
-    NBootstrapMethods (..),
-    NModule (..),
-    NModulePackages (..),
-    NModuleMainClass (..),
-    NNestHost (..),
-    NNestMembers (..),
-    NRecord (..),
-    NPermittedSubclasses (..),
-    NSynthetic (..),
-    NDeprecated (..),
-    NSignature (..),
-    NRuntimeVisibleAnnotations (..),
-    NRuntimeInvisibleAnnotations (..),
-    NRuntimeVisibleTypeAnnotations (..),
-    NRuntimeInvisibleTypeAnnotations (..),
-
     -- ** Class Attributes
     Attribute (..),
     InnerClass (..),
   )
 where
 
-import Data.Attoparsec.ByteString.Lazy (choice, count)
+import Data.Attoparsec.ByteString.Lazy (count)
 import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
-import Data.ByteString.Builder (byteString, word16BE, word32BE)
-import Data.IntMap ((!?))
+import Data.ByteString.Builder (Builder, byteString, word16BE, word32BE)
+import Data.ByteString.Char8 (pack, unpack)
+import Data.IntMap (lookupMin, (!?))
+import qualified Data.IntMap as IntMap (filter)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
 import Data.Oktade.Classfile.Metadata (Metadata (constantPool))
 import Data.Oktade.Classfile.Metadata.ConstantPool
-  ( ClassRef,
-    ConstantPool (..),
+  ( ConstantPool (..),
     ConstantPoolEntry (Utf8),
-    NameAndTypeRef,
     Utf8Ref (..),
   )
-import qualified Data.Oktade.Parse as P (parser, unparser)
-import Data.String (fromString)
+import qualified Data.Oktade.Parse as P (Parse (parser), unparser)
 import Data.Word (Word16)
 
 --------------------------------------------------------------------------------
@@ -75,352 +51,63 @@ instance Unparse Attributes where
     word16BE (fromIntegral $ length as) <> foldr ((<>) . unparser m) mempty as
 
 --------------------------------------------------------------------------------
--- Attribute Names
---------------------------------------------------------------------------------
-
-attrNameParser :: Word16 -> String -> Metadata -> a -> Maybe a
-attrNameParser i n m a = do
-  let (Just (Utf8 bs)) = entries (constantPool m) !? fromIntegral i
-  if bs == fromString n
-    then Just a
-    else Nothing
-
-checkAttrName :: MonadFail m => Maybe a -> m a
-checkAttrName (Just n) = return n
-checkAttrName _ = fail ""
-
-newtype NSourceFile = NSourceFile Utf8Ref
-  deriving (Show)
-
-instance Parse NSourceFile where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "SourceFile" m NSourceFile
-    return $ n $ Utf8Ref idx
-
-instance Unparse NSourceFile where
-  unparser _ (NSourceFile u) = P.unparser u
-
-newtype NInnerClasses = NInnerClasses Utf8Ref
-  deriving (Show)
-
-instance Parse NInnerClasses where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "InnerClasses" m NInnerClasses
-    return $ n $ Utf8Ref idx
-
-instance Unparse NInnerClasses where
-  unparser _ (NInnerClasses u) = P.unparser u
-
-newtype NEnclosingMethod = NEnclosingMethod Utf8Ref
-  deriving (Show)
-
-instance Parse NEnclosingMethod where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "EnclosingMethod" m NEnclosingMethod
-    return $ n $ Utf8Ref idx
-
-instance Unparse NEnclosingMethod where
-  unparser _ (NEnclosingMethod u) = P.unparser u
-
-newtype NSourceDebugExtension = NSourceDebugExtension Utf8Ref
-  deriving (Show)
-
-instance Parse NSourceDebugExtension where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser idx "SourceDebugExtension" m NSourceDebugExtension
-    return $ n $ Utf8Ref idx
-
-instance Unparse NSourceDebugExtension where
-  unparser _ (NSourceDebugExtension u) = P.unparser u
-
-newtype NBootstrapMethods = NBootstrapMethods Utf8Ref
-  deriving (Show)
-
-instance Parse NBootstrapMethods where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $ attrNameParser idx "BootstrapMethods" m NBootstrapMethods
-    return $ n $ Utf8Ref idx
-
-instance Unparse NBootstrapMethods where
-  unparser _ (NBootstrapMethods u) = P.unparser u
-
-newtype NModule = NModule Utf8Ref
-  deriving (Show)
-
-instance Parse NModule where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Module" m NModule
-    return $ n $ Utf8Ref idx
-
-instance Unparse NModule where
-  unparser _ (NModule u) = P.unparser u
-
-newtype NModulePackages = NModulePackages Utf8Ref
-  deriving (Show)
-
-instance Parse NModulePackages where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "ModulePackages" m NModulePackages
-    return $ n $ Utf8Ref idx
-
-instance Unparse NModulePackages where
-  unparser _ (NModulePackages u) = P.unparser u
-
-newtype NModuleMainClass = NModuleMainClass Utf8Ref
-  deriving (Show)
-
-instance Parse NModuleMainClass where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "ModuleMainClass" m NModuleMainClass
-    return $ n $ Utf8Ref idx
-
-instance Unparse NModuleMainClass where
-  unparser _ (NModuleMainClass u) = P.unparser u
-
-newtype NNestHost = NNestHost Utf8Ref
-  deriving (Show)
-
-instance Parse NNestHost where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "NestHost" m NNestHost
-    return $ n $ Utf8Ref idx
-
-instance Unparse NNestHost where
-  unparser _ (NNestHost u) = P.unparser u
-
-newtype NNestMembers = NNestMembers Utf8Ref
-  deriving (Show)
-
-instance Parse NNestMembers where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "NestMembers" m NNestMembers
-    return $ n $ Utf8Ref idx
-
-instance Unparse NNestMembers where
-  unparser _ (NNestMembers u) = P.unparser u
-
-newtype NRecord = NRecord Utf8Ref
-  deriving (Show)
-
-instance Parse NRecord where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Record" m NRecord
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRecord where
-  unparser _ (NRecord u) = P.unparser u
-
-newtype NPermittedSubclasses = NPermittedSubclasses Utf8Ref
-  deriving (Show)
-
-instance Parse NPermittedSubclasses where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser idx "PermittedSubclasses" m NPermittedSubclasses
-    return $ n $ Utf8Ref idx
-
-instance Unparse NPermittedSubclasses where
-  unparser _ (NPermittedSubclasses u) = P.unparser u
-
-newtype NSynthetic = NSynthetic Utf8Ref
-  deriving (Show)
-
-instance Parse NSynthetic where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Synthetic" m NSynthetic
-    return $ n $ Utf8Ref idx
-
-instance Unparse NSynthetic where
-  unparser _ (NSynthetic u) = P.unparser u
-
-newtype NDeprecated = NDeprecated Utf8Ref
-  deriving (Show)
-
-instance Parse NDeprecated where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Deprecated" m NDeprecated
-    return $ n $ Utf8Ref idx
-
-instance Unparse NDeprecated where
-  unparser _ (NDeprecated u) = P.unparser u
-
-newtype NSignature = NSignature Utf8Ref
-  deriving (Show)
-
-instance Parse NSignature where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Signature" m NSignature
-    return $ n $ Utf8Ref idx
-
-instance Unparse NSignature where
-  unparser _ (NSignature u) = P.unparser u
-
-newtype NRuntimeVisibleAnnotations = NRuntimeVisibleAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeVisibleAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeVisibleAnnotations"
-          m
-          NRuntimeVisibleAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeVisibleAnnotations where
-  unparser _ (NRuntimeVisibleAnnotations u) = P.unparser u
-
-newtype NRuntimeInvisibleAnnotations = NRuntimeInvisibleAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeInvisibleAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeInvisibleAnnotations"
-          m
-          NRuntimeInvisibleAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeInvisibleAnnotations where
-  unparser _ (NRuntimeInvisibleAnnotations u) = P.unparser u
-
-newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeVisibleTypeAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeVisibleTypeAnnotations"
-          m
-          NRuntimeVisibleTypeAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeVisibleTypeAnnotations where
-  unparser _ (NRuntimeVisibleTypeAnnotations u) = P.unparser u
-
-newtype NRuntimeInvisibleTypeAnnotations
-  = NRuntimeInvisibleTypeAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeInvisibleTypeAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeInvisibleTypeAnnotations"
-          m
-          NRuntimeInvisibleTypeAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeInvisibleTypeAnnotations where
-  unparser _ (NRuntimeInvisibleTypeAnnotations u) = P.unparser u
-
---------------------------------------------------------------------------------
 -- Attributes
 --------------------------------------------------------------------------------
 
 -- | A single attribute.
 data Attribute
-  = -- | Name of the original source file.
-    SourceFile NSourceFile Utf8Ref
-  | InnerClasses NInnerClasses [InnerClass]
-  | -- | Enclosing method of a local or anonymous class.
-    EnclosingMethod NEnclosingMethod ClassRef NameAndTypeRef
-  | SourceDebugExtension NSourceDebugExtension ByteString
-  | -- | Class is synthetic.
-    Synthetic NSynthetic
-  | Deprecated NDeprecated
-  | -- | Unknown attribute.
-    Unknown Utf8Ref ByteString
+  = SourceFile Utf8Ref
+  | InnerClasses [InnerClass]
+  | Unknown Utf8Ref ByteString
   deriving (Show)
 
 instance Parse Attribute where
-  parser m =
-    let parsers =
-          [ parserSourceFile,
-            parserInnerClasses,
-            parserEnclosingMethod,
-            parserSourceDebugExtension,
-            parserSynthetic,
-            parserDeprecated,
-            parserUnknown
-          ]
-     in choice parsers
+  parser m = anyWord16 >>= parser'
     where
-      parserSourceFile = SourceFile <$> parser m <*> (anyWord32 >> P.parser)
+      parser' i = do
+        case entries (constantPool m) !? fromIntegral i of
+          Just (Utf8 bs) -> parser'' (unpack bs) i
+          _ -> error "Invalid constant pool reference in attribute name"
+      parser'' n i
+        | n == sourceFileName = parserSourceFile
+        | n == innerClassesName = parserInnerClasses
+        | n == enclosingMethodName = parserUnknown i
+        | n == sourceDebugExtensionName = parserUnknown i
+        | n == bootstrapMethodsName = parserUnknown i
+        | n == moduleName = parserUnknown i
+        | n == modulePackagesName = parserUnknown i
+        | n == moduleMainClassName = parserUnknown i
+        | n == nestHostName = parserUnknown i
+        | n == nestMembersName = parserUnknown i
+        | n == recordName = parserUnknown i
+        | n == permittedSubclassesName = parserUnknown i
+        | n == syntheticName = parserUnknown i
+        | n == deprecatedName = parserUnknown i
+        | n == signatureName = parserUnknown i
+        | n == runtimeVisibleAnnotationsName = parserUnknown i
+        | n == runtimeInvisibleAnnotationsName = parserUnknown i
+        | n == runtimeVisibleTypeAnnotationsName = parserUnknown i
+        | n == runtimeInvisibleTypeAnnotationsName = parserUnknown i
+        | otherwise = parserUnknown i
+      parserSourceFile = anyWord32 >> SourceFile <$> P.parser
       parserInnerClasses =
-        InnerClasses
-          <$> parser m
-          <*> (anyWord32 >> anyWord16 >>= parseMultiple m)
-      parseMultiple md c = count (fromIntegral c) (parser md)
-      parserEnclosingMethod =
-        EnclosingMethod <$> parser m <*> (anyWord32 >> P.parser) <*> P.parser
-      parserSourceDebugExtension =
-        SourceDebugExtension
-          <$> parser m
-          <*> (anyWord32 >>= A.take . fromIntegral)
-      parserSynthetic =
-        Synthetic <$> do
-          n <- parser m
-          _ <- anyWord32
-          return n
-      parserDeprecated =
-        Deprecated <$> do
-          n <- parser m
-          _ <- anyWord32
-          return n
-      parserUnknown =
-        Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
+        anyWord32 >> InnerClasses <$> (anyWord16 >>= parseMultiple parser)
+      parserUnknown i =
+        Unknown (Utf8Ref i) <$> (anyWord32 >>= A.take . fromIntegral)
+      parseMultiple p i = count (fromIntegral i) (p m)
 
 instance Unparse Attribute where
-  unparser m (SourceFile n u) = unparser m n <> word32BE 2 <> P.unparser u
-  unparser m (InnerClasses n is) =
-    unparser m n
-      <> word32BE (fromIntegral (2 + 8 * length is))
+  unparser m (SourceFile u) =
+    nameUnparser sourceFileName m <> word32BE 2 <> P.unparser u
+  unparser m (InnerClasses is) =
+    nameUnparser innerClassesName m
+      <> word32BE (fromIntegral $ 2 + 8 * length is)
       <> word16BE (fromIntegral $ length is)
       <> foldr ((<>) . unparser m) mempty is
-  unparser m (EnclosingMethod n c n') =
-    unparser m n <> word32BE 4 <> P.unparser c <> P.unparser n'
-  unparser m (SourceDebugExtension n b) =
-    unparser m n <> word32BE (fromIntegral $ BS.length b) <> byteString b
-  unparser m (Synthetic n) = unparser m n <> word32BE 0
-  unparser m (Deprecated n) = unparser m n <> word32BE 0
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
 
-data InnerClass = InnerClass ClassRef ClassRef Utf8Ref Word16
+data InnerClass = InnerClass Utf8Ref Utf8Ref Utf8Ref Word16 -- TODO: access flags
   deriving (Show)
 
 instance Parse InnerClass where
@@ -429,3 +116,68 @@ instance Parse InnerClass where
 instance Unparse InnerClass where
   unparser _ (InnerClass i o n f) =
     P.unparser i <> P.unparser o <> P.unparser n <> word16BE f
+
+nameUnparser :: String -> Metadata -> Builder
+nameUnparser n m = do
+  let u = Utf8 $ pack n
+  let b = IntMap.filter (== u) $ entries $ constantPool m
+  case lookupMin b of
+    Just (i, _) -> word16BE $ fromIntegral i
+    Nothing -> error "not implemented" -- TODO: insert
+
+sourceFileName :: String
+sourceFileName = "SourceFile"
+
+innerClassesName :: String
+innerClassesName = "InnerClasses"
+
+enclosingMethodName :: String
+enclosingMethodName = "EnclosingMethod"
+
+sourceDebugExtensionName :: String
+sourceDebugExtensionName = "SourceDebugExtension"
+
+bootstrapMethodsName :: String
+bootstrapMethodsName = "BootstrapMethods"
+
+moduleName :: String
+moduleName = "Module"
+
+modulePackagesName :: String
+modulePackagesName = "ModulePackages"
+
+moduleMainClassName :: String
+moduleMainClassName = "ModuleMainClass"
+
+nestHostName :: String
+nestHostName = "NestHost"
+
+nestMembersName :: String
+nestMembersName = "NestMembers"
+
+recordName :: String
+recordName = "Record"
+
+permittedSubclassesName :: String
+permittedSubclassesName = "PermittedSubclasses"
+
+syntheticName :: String
+syntheticName = "Synthetic"
+
+deprecatedName :: String
+deprecatedName = "Deprecated"
+
+signatureName :: String
+signatureName = "Signature"
+
+runtimeVisibleAnnotationsName :: String
+runtimeVisibleAnnotationsName = "RuntimeVisibleAnnotations"
+
+runtimeInvisibleAnnotationsName :: String
+runtimeInvisibleAnnotationsName = "RuntimeInvisibleAnnotations"
+
+runtimeVisibleTypeAnnotationsName :: String
+runtimeVisibleTypeAnnotationsName = "RuntimeVisibleTypeAnnotations"
+
+runtimeInvisibleTypeAnnotationsName :: String
+runtimeInvisibleTypeAnnotationsName = "RuntimeInvisibleTypeAnnotations"

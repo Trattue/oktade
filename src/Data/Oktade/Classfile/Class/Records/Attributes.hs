@@ -8,28 +8,28 @@ module Data.Oktade.Classfile.Class.Records.Attributes
   ( -- * Attributes
     RecordAttributes (..),
 
-    -- ** Attribute Names
-    NSignature (..),
-    NRuntimeVisibleAnnotations (..),
-    NRuntimeInvisibleAnnotations (..),
-    NRuntimeVisibleTypeAnnotations (..),
-    NRuntimeInvisibleTypeAnnotations (..),
-
     -- ** Method Attributes
     RecordAttribute (..),
   )
 where
 
-import Data.Attoparsec.ByteString.Lazy (choice, count)
+import Data.Attoparsec.ByteString.Lazy (count)
 import qualified Data.Attoparsec.ByteString.Lazy as A (take)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
-import Data.ByteString.Builder (byteString, word16BE, word32BE)
+import Data.ByteString.Builder (Builder, byteString, word16BE, word32BE)
+import Data.ByteString.Char8 (pack, unpack)
+import Data.IntMap (lookupMin, (!?))
+import qualified Data.IntMap as IntMap (filter)
 import Data.Oktade.ByteParser (anyWord16, anyWord32)
-import Data.Oktade.Classfile.Class.Attributes (attrNameParser, checkAttrName)
 import Data.Oktade.Classfile.Class.Parse (Parse (..), Unparse (..))
-import Data.Oktade.Classfile.Metadata.ConstantPool (Utf8Ref (..))
-import qualified Data.Oktade.Parse as P (parser, unparser)
+import Data.Oktade.Classfile.Metadata (Metadata (constantPool))
+import Data.Oktade.Classfile.Metadata.ConstantPool
+  ( ConstantPool (entries),
+    ConstantPoolEntry (Utf8),
+    Utf8Ref (..),
+  )
+import qualified Data.Oktade.Parse as P (unparser)
 
 --------------------------------------------------------------------------------
 -- Attributes
@@ -51,95 +51,6 @@ instance Unparse RecordAttributes where
     word16BE (fromIntegral $ length as) <> foldr ((<>) . unparser m) mempty as
 
 --------------------------------------------------------------------------------
--- Attribute Names
---------------------------------------------------------------------------------
-
-newtype NSignature = NSignature Utf8Ref
-  deriving (Show)
-
-instance Parse NSignature where
-  parser m = do
-    idx <- anyWord16
-    n <- checkAttrName $ attrNameParser idx "Signature" m NSignature
-    return $ n $ Utf8Ref idx
-
-instance Unparse NSignature where
-  unparser _ (NSignature u) = P.unparser u
-
-newtype NRuntimeVisibleAnnotations = NRuntimeVisibleAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeVisibleAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeVisibleAnnotations"
-          m
-          NRuntimeVisibleAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeVisibleAnnotations where
-  unparser _ (NRuntimeVisibleAnnotations u) = P.unparser u
-
-newtype NRuntimeInvisibleAnnotations = NRuntimeInvisibleAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeInvisibleAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeInvisibleAnnotations"
-          m
-          NRuntimeInvisibleAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeInvisibleAnnotations where
-  unparser _ (NRuntimeInvisibleAnnotations u) = P.unparser u
-
-newtype NRuntimeVisibleTypeAnnotations = NRuntimeVisibleTypeAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeVisibleTypeAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeVisibleTypeAnnotations"
-          m
-          NRuntimeVisibleTypeAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeVisibleTypeAnnotations where
-  unparser _ (NRuntimeVisibleTypeAnnotations u) = P.unparser u
-
-newtype NRuntimeInvisibleTypeAnnotations
-  = NRuntimeInvisibleTypeAnnotations Utf8Ref
-  deriving (Show)
-
-instance Parse NRuntimeInvisibleTypeAnnotations where
-  parser m = do
-    idx <- anyWord16
-    n <-
-      checkAttrName $
-        attrNameParser
-          idx
-          "RuntimeInvisibleTypeAnnotations"
-          m
-          NRuntimeInvisibleTypeAnnotations
-    return $ n $ Utf8Ref idx
-
-instance Unparse NRuntimeInvisibleTypeAnnotations where
-  unparser _ (NRuntimeInvisibleTypeAnnotations u) = P.unparser u
-
---------------------------------------------------------------------------------
 -- Attributes
 --------------------------------------------------------------------------------
 
@@ -150,13 +61,41 @@ data RecordAttribute
   deriving (Show)
 
 instance Parse RecordAttribute where
-  parser _ =
-    let parsers = [parserUnknown]
-     in choice parsers
+  parser m = anyWord16 >>= parser'
     where
-      parserUnknown =
-        Unknown <$> P.parser <*> (anyWord32 >>= A.take . fromIntegral)
+      parser' i = do
+        case entries (constantPool m) !? fromIntegral i of
+          Just (Utf8 bs) -> parser'' (unpack bs) i
+          _ -> error "Invalid constant pool reference in attribute name"
+      parser'' n i
+        | n == signatureName = parserUnknown i
+        | otherwise = parserUnknown i
+      parserUnknown i =
+        Unknown (Utf8Ref i) <$> (anyWord32 >>= A.take . fromIntegral)
 
 instance Unparse RecordAttribute where
   unparser _ (Unknown u b) =
     P.unparser u <> word32BE (fromIntegral $ BS.length b) <> byteString b
+
+nameUnparser :: String -> Metadata -> Builder
+nameUnparser n m = do
+  let u = Utf8 $ pack n
+  let b = IntMap.filter (== u) $ entries $ constantPool m
+  case lookupMin b of
+    Just (i, _) -> word16BE $ fromIntegral i
+    Nothing -> error ""
+
+signatureName :: String
+signatureName = "Signature"
+
+runtimeVisibleAnnotationsName :: String
+runtimeVisibleAnnotationsName = "RuntimeVisibleAnnotations"
+
+runtimeInvisibleAnnotationsName :: String
+runtimeInvisibleAnnotationsName = "RuntimeInvisibleAnnotations"
+
+runtimeVisibleTypeAnnotationsName :: String
+runtimeVisibleTypeAnnotationsName = "RuntimeVisibleTypeAnnotations"
+
+runtimeInvisibleTypeAnnotationsName :: String
+runtimeInvisibleTypeAnnotationsName = "RuntimeInvisibleTypeAnnotations"
