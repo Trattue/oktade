@@ -26,7 +26,6 @@ spec = do
         Done {} -> return True
     content p = do
       classfile <- BS.readFile p
-      print p
       case parseClassfile classfile of
         Fail {} -> error $ show p
         (Done _ result) -> do

@@ -6,19 +6,19 @@ targeted for correct parsing are the same as of JDK for Java SE 17: 45 - 61
 (which corresponds to Java SE 1.0.2 - 17).
 
 **This software is still in early development and not ready for serious usage
-yet.**
+yet. Development is mainly happening on the [dev branch](/../../tree/dev)**
 
-Oktade is able to parse entire classfiles correctly, however some things still
-need to be done:
-* Argument parsing. Currently, all arguments are represented as bytestrings in
-their most general form possible.
+Oktade is able to parse and write entire classfiles correctly, however some
+things still need to be worked on:
+* Finish Argument parsing. Currently, many arguments are represented as
+bytestrings in their most general form possible.
   * Bytecode parsing.
+* Attribute validation: disallow multiple attributes of the same type if the
+type only allows one instance per classfile
 * Signature string parsing. Currently, signatures are stored as bytestrings.
-* MUTF-8 decoding and encoding.
-* Write tests.
-* Implement operations modifying the classfile/bytecode.
-* Profile and improve performance, if necessary.
-* Learn more Haskell and improve code quality.
+* MUTF-8 decoding and encoding. (If that is even necessary, did not have any
+issues with that so far...)
+* Implement operations for modifying the classfile/bytecode.
 
 ## Usage
 
@@ -48,11 +48,10 @@ application.
 
 For testing, run `cabal test --test-show-details=direct` afterwards.
 
-For benchmarking, run `cabal bench` afterwards. This will benchmark oktade
-parsing and unparsing every classfile in the cfr-tests project for 200
-iterations (after a warmup of 10 iterations). You can find more information on
-how the benchmark works in the files in the
-[testsuite/benchmarks/](testsuite/benchmarks/) folder.
+For benchmarking, run `cabal bench`. This will benchmark oktade parsing and
+unparsing every classfile in the cfr-tests project for 200 iterations (after a
+warmup of 10 iterations). You can find more information on how the benchmark
+works in the files in the [testsuite/benchmarks/](testsuite/benchmarks/) folder.
 
 ### Code Style
 
