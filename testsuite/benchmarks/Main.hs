@@ -84,5 +84,8 @@ parseClassfiles = mapM_ parse
 evaluation :: Integer -> Integer -> IO ()
 evaluation ms avgMs =
   putStrLn $
-    "Benchmark took " ++ show ms ++ "ms (" ++ show avgMs
-      ++ "ms per iteration in average).\n"
+    "Benchmark took "
+      ++ show ms
+      ++ "ms ("
+      ++ show avgMs
+      ++ "ms per iteration on average).\n"
