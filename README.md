@@ -28,12 +28,13 @@ The main executable can be used in a similar fashion to `javap`: Run
 ## Development
 ### Prerequisites
 
-A working installation of Haskell (GHC 8.10.7 or more recent) and cabal
+A working installation of Haskell (GHC 9.2.4 or more recent) and cabal
 (3.6.2.0 or more recent). The easiest way of obtaining those is using
 [GHCup](https://www.haskell.org/ghcup/).
 
 During development, try maintaining compatability with the GHC version marked as
-'recommended' in GHCup (currently GHC 8.10.7).
+'recommended' in GHCup (currently GHC 9.2.4). Older versions may work, but are
+not explicitly tested.
 
 ### Development Environment Setup
 
@@ -63,7 +64,7 @@ For the [.cabal file](oktade.cabal), use `cabal format`.
 
 ## License
 
-Copyright (c) 2021 Trattue
+Copyright (c) 2021-2022 Trattue
 
 Oktade is distributed under the terms of the Apache License (Version 2.0), see
 [LICENSE](LICENSE) for details.
