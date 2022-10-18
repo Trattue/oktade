@@ -72,10 +72,11 @@ Oktade is distributed under the terms of the Apache License (Version 2.0), see
 The oktade repository includes code from other projects which may be licensed
 under other terms and conditions:
 * [cfr_tests](https://github.com/leibnitz27/cfr_tests): Licensed under the MIT
-  License license (see [testsuite/tests/LICENSE](testsuite/tests/LICENSE) for
-  details).<br>
+  License (see the [included LICENSE file](testsuite/resources/cfr-tests/LICENSE) 
+  for details).<br>
   Compiled classes from the project can be found in the
-  [testsuite/tests/](testsuite/tests/) directory.<br>
+  [testsuite/resources/cfr-tests/](testsuite/resources/cfr-tests/)
+  directory.<br>
   Thanks to the [CFR](https://github.com/leibnitz27/cfr) developers for making
   their comprehensive test suite open source!
 
