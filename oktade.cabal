@@ -8,11 +8,18 @@ author:        Trattue
 synopsis:      Parser for JVM classfiles
 
 library
-    exposed-modules:  Oktade.Classfile
+    exposed-modules:
+        Oktade.Internal.Classfile
+        Oktade.Internal.Classfile.AccessFlags
+        Oktade.Internal.Classfile.ConstantPool
+        Oktade.Internal.Classfile.Version
+
     hs-source-dirs:   src
     default-language: Haskell2010
     ghc-options:      -Wall
-    build-depends:    base
+    build-depends:
+        base,
+        containers
 
 executable oktade
     main-is:          Main.hs
